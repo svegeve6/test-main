@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminSocket } from '../contexts/AdminSocket';
-import { Globe, Shield, Bot, Link, FileCode, Fish, Anchor, Waves } from 'lucide-react';
+import { Globe, Shield, Bot, Link, FileCode, Skull } from 'lucide-react';
 import BannedIPs from './BannedIPs';
-import AnimatedFish from './AnimatedFish';
 
 const SettingToggle = ({ icon: Icon, title, description, enabled, onToggle, color }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -25,22 +24,22 @@ const SettingToggle = ({ icon: Icon, title, description, enabled, onToggle, colo
   }, [isAnimating]);
 
   const getIconColor = () => {
-    if (!enabled) return 'text-cyan-300/50';
-    if (Icon === Fish) return enabled ? 'text-cyan-400' : 'text-cyan-300/50';
+    if (!enabled) return 'text-white/50';
+    if (Icon === Skull) return enabled ? 'text-red-500' : 'text-white/50';
     switch (color) {
-      case 'green': return 'text-emerald-400';
-      case 'blue': return 'text-cyan-400';
-      case 'purple': return 'text-indigo-400';
+      case 'green': return 'text-green-400';
+      case 'blue': return 'text-blue-400';
+      case 'purple': return 'text-purple-400';
       case 'red': return 'text-red-400';
-      default: return 'text-blue-400';
+      default: return 'text-gray-400';
     }
   };
 
   const getIconAnimation = () => {
-    if (Icon === Fish && enabled) {
+    if (Icon === Skull && enabled) {
       return 'animate-pulse hover:animate-bounce';
     }
-    return enabled ? 'animate-pulse' : '';
+    return enabled ? 'animate-pulse-subtle' : '';
   };
 
   const handleToggle = () => {
@@ -55,9 +54,9 @@ const SettingToggle = ({ icon: Icon, title, description, enabled, onToggle, colo
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Special fish glow effect */}
-      {enabled && Icon === Fish && (
-        <div className="absolute inset-0 bg-cyan-400/10 animate-pulse" />
+      {/* Special skull glow effect */}
+      {enabled && Icon === Skull && (
+        <div className="absolute inset-0 bg-red-500/5 animate-pulse-slow" />
       )}
 
       {/* Status change animation */}
@@ -74,22 +73,22 @@ const SettingToggle = ({ icon: Icon, title, description, enabled, onToggle, colo
           <div className={`
             absolute inset-0 blur-2xl transition-all duration-1000
             bg-gradient-to-r ${
-              Icon === Fish ? 'from-cyan-400/20 to-blue-500/10' :
-              color === 'green' ? 'from-emerald-400/10' : 
-              color === 'blue' ? 'from-cyan-400/10' : 
-              color === 'purple' ? 'from-indigo-400/10' : 
-              'from-red-400/10'} to-transparent
+              Icon === Skull ? 'from-red-500/20 to-orange-500/10' :
+              color === 'green' ? 'from-green-500/10' : 
+              color === 'blue' ? 'from-blue-500/10' : 
+              color === 'purple' ? 'from-purple-500/10' : 
+              'from-red-500/10'} to-transparent
             animate-pulse-subtle
             ${isAnimating ? 'scale-110 opacity-75' : 'scale-100 opacity-50'}
           `} />
           <div className={`
             absolute inset-0 blur-md
             bg-gradient-to-r ${
-              Icon === Fish ? 'from-cyan-400/30 to-blue-500/20' :
-              color === 'green' ? 'from-emerald-400/20' : 
-              color === 'blue' ? 'from-cyan-400/20' : 
-              color === 'purple' ? 'from-indigo-400/20' : 
-              'from-red-400/20'} to-transparent
+              Icon === Skull ? 'from-red-500/30 to-orange-500/20' :
+              color === 'green' ? 'from-green-500/20' : 
+              color === 'blue' ? 'from-blue-500/20' : 
+              color === 'purple' ? 'from-purple-500/20' : 
+              'from-red-500/20'} to-transparent
             transition-opacity duration-500
             ${isAnimating ? 'opacity-100' : 'opacity-0'}
           `} />
@@ -230,20 +229,16 @@ const InputField = ({ icon: Icon, label, value, onChange, type = "text" }) => {
 const Card = ({ title, children }) => (
   <div className="relative rounded-2xl overflow-hidden group">
     {/* Background layers */}
-    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl" />
-    <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-    <div className="absolute inset-0 rounded-2xl border border-cyan-400/20" />
+    <div className="absolute inset-0 bg-white/[0.08] backdrop-blur-xl" />
+    <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     
     <div className="relative">
-      <div className="px-4 py-3 border-b border-cyan-400/10">
-        <div className="flex items-center gap-2">
-          <Waves className="w-5 h-5 text-cyan-400" />
-          <h2 className="text-lg font-medium text-white/90 transition-transform duration-300 group-hover:translate-x-1">
-            {title}
-          </h2>
-        </div>
+      <div className="px-4 py-3 border-b border-white/[0.06]">
+        <h2 className="text-lg font-medium text-white/90 transition-transform duration-300 group-hover:translate-x-1">
+          {title}
+        </h2>
       </div>
-      <div className="divide-y divide-cyan-400/10">
+      <div className="divide-y divide-white/[0.06]">
         {children}
       </div>
     </div>
@@ -262,7 +257,7 @@ export default function Settings() {
       {/* Main Settings Column */}
       <div className="lg:col-span-8 space-y-6">
         {/* Security Settings Card */}
-        <Card title="FishTank Security">
+        <Card title="Security Settings">
           <SettingToggle
             icon={Globe}
             title="Website Status"
@@ -288,17 +283,17 @@ export default function Settings() {
             color="purple"
           />
           <SettingToggle
-            icon={Fish}
-            title="Fish Mode"
-            description="Enable special fish features"
+            icon={Skull}
+            title="Skulpt Button"
+            description="Doesn't do anything"
             enabled={settings.captchaEnabled}
             onToggle={() => handleToggle('captchaEnabled')}
-            color="blue"
+            color="red"
           />
         </Card>
 
         {/* Configuration Card */}
-        <Card title="FishTank Configuration">
+        <Card title="Configuration">
           <InputField
             icon={Link}
             label="Redirect URL"
