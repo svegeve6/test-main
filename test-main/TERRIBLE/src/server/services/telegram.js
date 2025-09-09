@@ -168,8 +168,7 @@ export function formatTelegramMessage(type, data) {
             return [
                 'FishTank Status 🐟',
                 SEPARATOR,
-                `⚡️ Status: ${data.status}`,
-                `🔌 Port: ${data.port}`,
+                `🟢 Status: ${data.status}`,
                 SEPARATOR,
                 `⏰ ${timestamp}`
             ].join('\n');
