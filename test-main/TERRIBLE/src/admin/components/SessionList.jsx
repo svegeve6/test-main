@@ -391,7 +391,6 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
       'ledgerdisconnect': 'Ledger Disconnect',
       'trezordisconnect': 'Trezor Disconnect',
       'loading': 'Loading',
-      'lobstrloading': 'Lobstr Loading',
       'review': 'Review'
     };
   
