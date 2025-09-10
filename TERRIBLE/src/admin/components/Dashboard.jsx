@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminSocket } from '../contexts/AdminSocket';
 import { 
-  Users, Globe, Fish, Trash2, Download, Waves, Anchor
+  Users, Shield, Globe, Fish, Trash2, Download, Waves, Anchor
 } from 'lucide-react';
 import AnimatedFish from './AnimatedFish';
 
@@ -133,7 +133,7 @@ const QuickAction = ({ icon: Icon, label, onClick, variant = 'primary', active =
   );
 };
 
-export default function Dashboard({ selectedBrand, setSelectedBrand }) {
+export default function Dashboard() {
   const { sessions, settings, bannedIPs, clearSessions, updateSettings } = useAdminSocket();
 
   const activeSessions = sessions.filter(s => s.connected).length;
@@ -177,51 +177,6 @@ export default function Dashboard({ selectedBrand, setSelectedBrand }) {
             <h3 className="text-white/90 text-lg font-medium">Quick Actions</h3>
           </div>
           <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-3">
-            {/* Brand Selector - styled like QuickAction */}
-            <div className="relative">
-              <button
-                className="group relative flex items-center space-x-2 
-                         px-3 py-2 lg:px-4 lg:py-2 rounded-lg
-                         bg-white/[0.05] hover:bg-white/[0.08]
-                         backdrop-blur-xl border border-white/[0.05]
-                         transition-all duration-300 w-full lg:w-auto
-                         overflow-hidden min-w-[160px]"
-                style={{ pointerEvents: 'none' }}
-              >
-                {/* Background glow */}
-                <div className="absolute inset-0 transition-opacity duration-300
-                              bg-gradient-to-r from-blue-500/10 to-transparent
-                              opacity-0 group-hover:opacity-100" />
-                
-                {/* Brand text with styling */}
-                <span className="text-sm text-blue-400 transition-transform duration-300 group-hover:translate-x-0.5">
-                  {selectedBrand}
-                </span>
-                
-                {/* Dropdown arrow */}
-                <svg 
-                  className="w-3 h-3 text-blue-400"
-                  fill="currentColor" 
-                  viewBox="0 0 320 512"
-                >
-                  <path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/>
-                </svg>
-              </button>
-              
-              <select
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                style={{ 
-                  WebkitAppearance: 'none',
-                  MozAppearance: 'none'
-                }}
-              >
-                <option value="Coinbase">Coinbase</option>
-                <option value="Lobstr">Lobstr</option>
-              </select>
-            </div>
-
             <QuickAction
               icon={Fish}
               label={`${settings.showEmojis ? 'Hide' : 'Show'} Fish Icons`}
