@@ -224,11 +224,12 @@ const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered, selected
     }
   };
   
-  const pageCategories = brandCategories[selectedBrand] || brandCategories.Coinbase
+  const pageCategories = brandCategories[selectedBrand] || brandCategories.Coinbase;
 
   return (
     <div className="relative flex-shrink-0" style={{ maxWidth: '180px' }}>
       <select
+        key={selectedBrand}
         value={selectedPage}
         onChange={(e) => onPageChange(e.target.value)}
         style={{ 
