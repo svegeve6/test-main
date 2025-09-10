@@ -207,7 +207,7 @@ export default function Dashboard({ selectedBrand, setSelectedBrand }) {
               
               {/* Brand Dropdown Menu */}
               {isBrandDropdownOpen && (
-                <div className="absolute top-full mt-1 left-0 w-full bg-[#0A0F1B]/95 backdrop-blur-xl border border-cyan-400/20 rounded-lg shadow-xl z-50 overflow-hidden">
+                <div className="absolute bottom-full mb-1 left-0 w-full bg-[#0A0F1B]/95 backdrop-blur-xl border border-cyan-400/20 rounded-lg shadow-xl z-50 overflow-hidden">
                   {['Coinbase', 'Lobstr', 'MetaMask', 'Trust Wallet'].map(brand => (
                     <button
                       key={brand}
