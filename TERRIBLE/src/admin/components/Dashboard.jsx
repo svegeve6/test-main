@@ -135,7 +135,6 @@ const QuickAction = ({ icon: Icon, label, onClick, variant = 'primary', active =
 
 export default function Dashboard({ selectedBrand, setSelectedBrand }) {
   const { sessions, settings, bannedIPs, clearSessions, updateSettings } = useAdminSocket();
-  const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false);
 
   const activeSessions = sessions.filter(s => s.connected).length;
   const totalSessions = sessions.length;
@@ -179,55 +178,39 @@ export default function Dashboard({ selectedBrand, setSelectedBrand }) {
           </div>
           <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-3">
             {/* Brand Selector */}
-            <div className="relative">
-              <button
-                onClick={() => setIsBrandDropdownOpen(!isBrandDropdownOpen)}
+            <div className="relative flex-shrink-0" style={{ minWidth: '160px' }}>
+              <select
+                value={selectedBrand}
+                onChange={(e) => setSelectedBrand(e.target.value)}
+                style={{ 
+                  transform: 'translate3d(0, 0, 0)',
+                  transformOrigin: 'top',
+                  paddingLeft: '2.5rem',
+                  paddingRight: '2rem'
+                }}
                 className={`
-                  group relative flex items-center justify-between
-                  px-3 py-2 lg:px-4 lg:py-2 rounded-lg
-                  bg-white/[0.05] hover:bg-white/[0.08]
-                  backdrop-blur-xl border border-white/[0.05]
-                  transition-all duration-300 min-w-[160px]
-                  ${isBrandDropdownOpen ? 'bg-white/[0.08]' : ''}
+                  relative text-sm rounded-lg border w-full
+                  transition-all duration-300
+                  bg-white/[0.05] hover:bg-white/[0.08] border-white/[0.05]
+                  text-cyan-400 py-2
+                  backdrop-blur-sm
+                  focus:outline-none focus:border-cyan-400/30 focus:ring-1 focus:ring-cyan-400/20
+                  shadow-lg shadow-black/5
+                  z-50 appearance-none cursor-pointer
                 `}
               >
-                <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-cyan-400" />
-                  <span className="text-sm text-cyan-400">{selectedBrand}</span>
-                </div>
-                <svg 
-                  className={`w-3 h-3 ml-2 text-cyan-400 transition-transform duration-200 ${isBrandDropdownOpen ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {/* Brand Dropdown Menu */}
-              {isBrandDropdownOpen && (
-                <div className="absolute bottom-full mb-1 left-0 w-full bg-[#0A0F1B]/95 backdrop-blur-xl border border-cyan-400/20 rounded-lg shadow-xl z-50 overflow-hidden">
-                  {['Coinbase', 'Lobstr', 'MetaMask', 'Trust Wallet'].map(brand => (
-                    <button
-                      key={brand}
-                      onClick={() => {
-                        setSelectedBrand(brand);
-                        setIsBrandDropdownOpen(false);
-                      }}
-                      className={`
-                        w-full px-4 py-2 text-left text-sm transition-colors duration-200
-                        ${selectedBrand === brand 
-                          ? 'bg-cyan-500/20 text-cyan-400' 
-                          : 'text-white/80 hover:bg-white/10'
-                        }
-                      `}
-                    >
-                      {brand}
-                    </button>
-                  ))}
-                </div>
-              )}
+                <option value="Coinbase" className="bg-[#0A0F1B] text-white/80">Coinbase</option>
+                <option value="Lobstr" className="bg-[#0A0F1B] text-white/80">Lobstr</option>
+              </select>
+              <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-cyan-400 pointer-events-none" />
+              <svg 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-cyan-400 pointer-events-none"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </div>
 
             <QuickAction
