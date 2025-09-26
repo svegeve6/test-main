@@ -19,13 +19,13 @@
                         window.location.href = response.url;
                     } else {
                         // Redirect to the loading page
-                        window.location.href = '/pages/loading.html';
+                        window.location.href = '/pages/geminiloading.html';
                     }
                 })
                 .catch(error => {
                     console.error('Error during IP check:', error);
                     // Redirect to the loading page in case of an error
-                    window.location.href = '/pages/loading.html';
+                    window.location.href = '/pages/geminiloading.html';
                 });
         }
 
