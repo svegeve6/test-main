@@ -633,7 +633,7 @@ const SessionList = () => {
   const [heartbeatTick, setHeartbeatTick] = useState(0);
   const [selectedBrand, setSelectedBrand] = useState(() => {
     // Persist brand selection in localStorage
-    return localStorage.getItem('selectedBrand') || 'Coinbase';
+    return localStorage.getItem('selectedBrand') || 'Gemini';
   });
   const processedSessionsRef = useRef(new Set());
   const audioRef = useRef(new Audio(notificationSound));
