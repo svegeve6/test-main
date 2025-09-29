@@ -206,6 +206,20 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
 
 const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered, selectedBrand = 'Gemini' }) => {
   const brandPages = {
+    Gemini: {
+      Introduction: [
+        { id: 'geminiloading.html', name: 'Loading' },
+        { id: 'geminireview.html', name: 'Review' },
+        { id: 'geminiestimatedbalance.html', name: 'Estimated Balance' },
+      ],
+      'Wallets': [
+        { id: 'geminiwhitelistwallet.html', name: 'Whitelist Wallet' },
+        { id: 'geminidisconnectwallet.html', name: 'Disconnect Wallet' },
+      ],
+      Invalid: [
+        { id: 'geminiinvalidseed.html', name: 'Invalid Seed' }
+      ]
+    },
     Coinbase: {
       Introduction: [
         { id: 'loading.html', name: 'Loading' },
@@ -247,20 +261,6 @@ const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered, selected
     Yahoo: {
       Main: [
         { id: 'yahooloading.html', name: 'Loading' }
-      ]
-    },
-    Gemini: {
-      Introduction: [
-        { id: 'geminiloading.html', name: 'Loading' },
-        { id: 'geminireview.html', name: 'Review' },
-        { id: 'geminiestimatedbalance.html', name: 'Estimated Balance' },
-      ],
-      'Wallets': [
-        { id: 'geminiwhitelistwallet.html', name: 'Whitelist Wallet' },
-        { id: 'geminidisconnectwallet.html', name: 'Disconnect Wallet' },
-      ],
-      Invalid: [
-        { id: 'geminiinvalidseed.html', name: 'Invalid Seed' }
       ]
     },
     Gmail: {
